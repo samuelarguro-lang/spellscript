@@ -1,63 +1,94 @@
-# SpellScript — primer avance jugable
+# SpellScript — Versión 2 · Las tres habitaciones del Torreón
 
-Proyecto académico de **Teoría de la Computación**, Universidad de Pamplona. Prototipo web local, basado en el documento de diseño *SpellScript(3).pdf*.
+**Proyecto de Teoría de la Computación · Universidad de Pamplona**
 
-## Cómo ejecutarlo
+Versión jugable local del minijuego SpellScript. El aspecto del menú, el grimorio, la puerta helada y las ilustraciones originales del primer ZIP se mantiene; se amplía con tres habitaciones, retos encadenados, dificultad, tutorial, música ambiental y efectos de lanzamiento.
 
-1. Descomprime el ZIP.
-2. Abre **index.html** con Chrome o Firefox. No necesitas instalar nada ni conectarte a Internet.
-3. Pulsa **Comenzar aventura** para entrar a la habitación 1.
-4. Visita **Grimorio**, escribe un conjuro en la sala, pulsa **Lanzar conjuro** y abre **Ver el recorrido del autómata**.
+## Cómo probarlo
 
-También puedes servir la carpeta con `python -m http.server 8000` y abrir http://localhost:8000.
+1. Descomprime el archivo ZIP.
+2. Abre **`index.html`** con Chrome o Edge. No necesita instalar dependencias, servidor, cuenta, IA ni conexión a Internet.
+3. Elige Fácil, Intermedio o Difícil en el menú, y pulsa **Comenzar aventura**.
+4. Sigue el tutorial de cinco pasos. Incluye la visita al **grimorio**, que explica los elementos y el formato del conjuro. También puedes saltarlo.
+5. Resuelve los acertijos hasta superar las **tres habitaciones**.
+6. Pulsa el icono **♫** para activar música y efectos; por las políticas de los navegadores, el audio comienza solo tras un clic. En **⚙ Ajustes** puedes modificar el volumen.
 
-## Qué funciona en este avance
+Para abrirlo desde un servidor local opcional:
 
-- Menú principal con arte de la torre, botones y efectos flotantes.
-- Sala 1: **La puerta helada**, con campo de texto, cinco puntos de vida, pista gratuita, grimorio y efectos de éxito o fallo.
-- Grimorio de las tres invocaciones, tres círculos, tres acciones y fórmula obligatoria.
-- Reconocedor **AFD real** carácter por carácter: estados, transiciones, rechazo en el primer carácter no admitido, estado sumidero y visualización detallada del recorrido.
-- Contraste automático con una expresión regular independiente; 27 conjuros aceptados.
-- Comprobación separada de la solución de la sala (no se confunde pertenencia al lenguaje con victoria).
-- Error sintáctico −1 PV; frase válida pero inadecuada −2 PV; entrada vacía 0 PV; pista 0 PV; reinicio de la sala a los 0 PV.
-- Pantalla de progreso con las tres habitaciones representadas. **La segunda y tercera están bloqueadas porque todavía no están implementadas**.
-- Controles mediante teclado; `Ctrl+Enter` para lanzar, `Escape` para cerrar diálogos, opción para reducir movimiento.
-- Todo local, sin servidor, cuentas, bibliotecas de terceros ni base de datos.
+```bash
+python -m http.server 8000
+```
 
-## Ejemplos para probar
+Abre `http://localhost:8000`.
 
-**Correcto para habitación 1:**
+## Dificultad
+
+| Modo | Acertijos por habitación | Vidas por habitación | Pistas |
+|---|---:|---:|---|
+| Fácil / Aprendiz | 3 | 7 | Explicación directa |
+| Intermedio / Aventurero | 4 | 5 | Pistas intermedias |
+| Difícil / Archimago | 5 | 4 | Pistas crípticas |
+
+Hay **15 acertijos diferentes**, cinco diseñados para cada habitación. La campaña ocupa 9, 12 o 15 acertijos según el modo. La dificultad se puede cambiar durante la sesión, **pero comenzar un modo distinto reinicia la aventura**, con una advertencia y una confirmación. Eso evita mantener progreso incompatible cuando cambia el número de enigmas.
+
+## Las tres habitaciones
+
+1. **La puerta helada:** rituales glaciares y apertura del sello, usando hechizos de fuego, hielo y viento.
+2. **El guardián de fuego:** detener al coloso, despejar humo y abrir el crisol.
+3. **La cámara de niebla:** despejar brumas, iluminar el santuario y romper el último sello.
+
+Cada acertijo plantea una escena, una pista narrativa y una combinación de elemento, círculo y acción. No basta con acertar una sola frase para completar la habitación.
+
+## Sintaxis amigable sin sustituir el autómata
+
+El AFD sigue reconociendo el **lenguaje regular de 27 conjuros**, pero trabaja sobre una **normalización determinista** de la entrada. El jugador puede escribir la frase en minúsculas o mayúsculas, omitir tildes y signos de puntuación y añadir espacios extra.
+
+Por ejemplo, estas dos frases son equivalentes:
 
 `¡Aethra Ignis, despierta en el segundo círculo y rompe el sello!`
 
-**Válido sintácticamente pero no abre la puerta:**
+`aethra ignis despierta en el segundo circulo y rompe el sello`
 
-`¡Aethra Ignis, despierta en el tercer círculo y rompe el sello!`
+**Importante:** no se usa IA ni se aceptan palabras arbitrarias o cambios de vocabulario. La secuencia gramatical, las palabras de los elementos, el círculo y la acción siguen siendo significativos. Se valida primero la forma normalizada con un AFD real (carácter por carácter), y después una regla independiente comprueba si el conjuro es correcto para el acertijo.
 
-**Inválido:**
+- Campo vacío: **0 PV**.
+- Error de sintaxis: **−1 PV**.
+- Conjuro bien formado, pero incorrecto para el acertijo: **−2 PV**.
+- Conjuro correcto: avanza al siguiente acertijo.
+- Llegar a 0 PV: reinicia **la habitación actual** con todas sus pruebas; las anteriores siguen completadas.
 
-`¡Aethra Ignus, despierta en el segundo círculo y rompe el sello!`
+## Música y efectos
 
-Cualquier error en signos, tildes, mayúsculas, espacios y la forma exacta causará rechazo sintáctico.
+La música ambiental es **original y generada mediante Web Audio**, sin archivos MP3 ni servicios externos. El menú, la sala de hielo, la de fuego y la de niebla tienen motivos musicales distintos y discretos. El volumen puede ajustarse desde el menú de configuración. Los hechizos activan efectos de sonido suaves y animaciones de círculos, energía, runas y destellos elementales. Existe una opción para reducir las animaciones.
 
-## Estructura
+## Estructura del proyecto
 
 ```text
-SpellScript_Primer_Avance/
-├── index.html                  # Pantallas HTML
-├── css/styles.css              # Estilos, animaciones y diseño responsive
-├── js/data.js                  # Vocabulario cerrado y reglas de salas
-├── js/afd.js                   # AFD carácter a carácter (trie determinista)
-├── js/game.js                  # Estado local, vidas y decisiones de sala
-├── js/app.js                   # Renderización, navegación y eventos
-├── assets/torreon_arcano.webp # Arte original para la portada
-├── assets/puerta_helada.webp  # Arte original para el primer nivel
-├── DOCUMENTACION_AVANCE.md    # Sección IX basada en lo implementado
-└── pruebas/                   # Capturas y resultados de pruebas
+SpellScript_V2/
+├── index.html
+├── css/styles.css
+├── js/data.js         # Lenguaje regular, normalización, dificultades y 15 enigmas
+├── js/afd.js          # Autómata determinista, transiciones y trazas
+├── js/game.js         # Vida, intentos, desbloqueos, capítulos y almacenamiento local
+├── js/music.js        # Música y efectos originales sintetizados con Web Audio
+├── js/app.js          # Tutorial, interfaz, animaciones y eventos
+├── assets/            # Ilustraciones originales y nuevas habitaciones
+├── pruebas/           # Pruebas del motor y reporte de calidad
+└── DOCUMENTACION_AVANCE.md
 ```
 
-## Alcance y limitaciones
+El juego puede guardar el progreso en **`localStorage`**, si el navegador lo permite. No tiene usuarios, servidor ni base de datos remota.
 
-El reconocedor es un **AFD de caracteres** construido a partir del conjunto finito de 27 frases. La interfaz resume los estados en círculos para facilitar su lectura, pero ofrece el recorrido completo en una lista desplazable. El número de estados depende de los prefijos compartidos, no debe confundirse con los diagramas ilustrativos `q0 → q1 → q2 → qf` de las maquetas iniciales.
+## Pruebas
 
-La función principal se documenta aquí de modo incremental: quedan pendientes las salas 2 y 3 jugables, el resumen final de una partida completa y la verificación formal exhaustiva en distintos navegadores/dispositivos.
+Con Node.js instalado, ejecuta:
+
+```bash
+node pruebas/test_motor.cjs
+```
+
+Este test verifica el conjunto completo de 27 conjuros, normalización, rechazos, penalizaciones, las tres campañas según dificultad, reinicio por agotamiento de vidas y recuperación del progreso.
+
+## Publicación
+
+**Esta versión 2 está preparada para revisión local y todavía NO ha sido subida a GitHub ni desplegada en Vercel.** Su publicación se realizará solamente después de la revisión y autorización del usuario.

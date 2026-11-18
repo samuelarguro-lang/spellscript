@@ -45,12 +45,17 @@
             <div class="title-line" aria-hidden="true"><span>◆</span></div>
             <p class="home-subtitle">Un minijuego de acertijos mágicos</p>
             <p class="home-description">Domina las <strong>lenguas regulares</strong> y los <strong>autómatas finitos deterministas</strong> para romper los sellos del torreón arcano.</p>
+            <div class="difficulty-home" aria-label="Elige dificultad">
+              <p class="small-heading">✧ ELIGE TU DIFICULTAD ✧</p>
+              <div class="difficulty-switch" id="homeDifficulty"><button type="button" class="difficulty-option" data-difficulty="facil">✧ Fácil</button><button type="button" class="difficulty-option active" data-difficulty="normal">⚔ Intermedio</button><button type="button" class="difficulty-option" data-difficulty="dificil">♛ Difícil</button></div>
+              <p class="difficulty-description" id="difficultyDescription">4 acertijos por sala · 5 puntos de vida.</p>
+            </div>
             <div class="home-buttons">
               <button type="button" class="arcane-button primary giant" id="startButton"><span class="play-triangle">▶</span> Comenzar aventura</button>
               <button type="button" class="arcane-button secondary" data-go="grimorio"><span>▣</span> Consultar grimorio</button>
-              <button type="button" class="arcane-button secondary" data-go="progreso"><span>✦</span> Progreso de la aventura</button>
+              <button type="button" class="arcane-button secondary" data-go="progreso"><span>✦</span> Progreso de la aventura</button><button type="button" class="tiny-tutorial-link" id="tutorialReplayHome">✧ ¿Primera vez? Ver tutorial</button>
             </div>
-            <p class="home-meta">Primera versión jugable · Habitación 1 de 3</p>
+<p class="home-meta">Tres habitaciones jugables · 27 conjuros · 3 dificultades</p>
           </div>
           <div class="hero-inscription" aria-hidden="true">ᚨ &nbsp; ᛟ &nbsp; ᚠ</div>
           <div class="floating-crystal crystal-a" aria-hidden="true">◆</div>
@@ -62,53 +67,55 @@
 
       <!-- SALA 1: Jugable -->
       <section class="view" id="view-aventura" aria-labelledby="adventureTitle">
-        <div class="section-topline"><span>AVENTURA PRINCIPAL</span><span>Capítulo I · El grimorio perdido</span></div>
-        <div class="room-screen fantasy-frame" id="roomScreen">
+        <div class="section-topline"><span>AVENTURA PRINCIPAL</span><span id="adventureChapter">Capítulo I · El grimorio perdido</span></div>
+        <div class="room-screen fantasy-frame" id="roomScreen" data-room="hielo">
           <div class="room-bg" aria-hidden="true"></div>
           <div class="room-wash" aria-hidden="true"></div>
           <aside class="room-sidebar fantasy-panel">
             <p class="small-heading">PROGRESO DEL NIVEL</p>
-            <div class="room-selector"><span class="room-dot active">✦</span><strong>Habitación 1</strong><span>01</span></div>
-            <div class="room-selector disabled"><span class="room-dot">♧</span>Habitación 2 <span>🔒</span></div>
-            <div class="room-selector disabled"><span class="room-dot">♧</span>Habitación 3 <span>🔒</span></div>
+            <div class="room-selector" id="sidebarRoom0"><span class="room-dot active">✦</span><strong>Habitación 1</strong><span>01</span></div>
+            <div class="room-selector disabled" id="sidebarRoom1"><span class="room-dot">♧</span>Habitación 2 <span>🔒</span></div>
+            <div class="room-selector disabled" id="sidebarRoom2"><span class="room-dot">♧</span>Habitación 3 <span>🔒</span></div>
             <div class="mini-divider"></div>
             <div class="room-detail">
-              <div class="element-icon ice">❄</div>
+              <div class="element-icon ice" id="roomElement">❄</div>
               <h2 id="adventureTitle">La puerta helada</h2>
-              <p>Un sello ancestral bloquea el acceso al torreón.</p>
-              <span class="level-pill">NIVEL 01 · HIELO</span>
+              <p id="roomAmbient">Un sello ancestral bloquea el acceso al torreón.</p>
+              <span class="level-pill" id="roomLevelPill">NIVEL 01 · HIELO</span>
             </div>
             <div class="side-bottom">La magia obedece reglas exactas.</div>
           </aside>
           <div class="room-illustration" aria-label="Puerta helada protegida por un sello mágico">
             <div class="snowfall" aria-hidden="true" id="snowfall"></div>
             <div class="door-aura" aria-hidden="true"></div>
+            <div class="spellcasting-scene" id="spellcastingScene" aria-hidden="true"><div class="spellcaster">✦</div><div class="spell-beam"></div><div class="spell-impact">✺</div><div class="spell-runes">✧ ✵ ✺ ✧</div></div>
             <div class="cast-effect" id="castEffect" aria-hidden="true">✧</div>
-            <span class="scenario-tag">✧ EL SELLO DE GLACIES ✧</span>
+            <span class="scenario-tag" id="scenarioTag">✧ EL SELLO DE GLACIES ✧</span>
           </div>
           <aside class="puzzle-panel fantasy-panel" id="puzzlePanel">
-            <div class="puzzle-head"><span class="chapter-label">HABITACIÓN 1 DE 3</span><div id="roomHearts" class="hearts" aria-label="5 puntos de vida">♥ ♥ ♥ ♥ ♥</div></div>
-            <h2 class="panel-title">❄ &nbsp;La puerta helada</h2>
+            <div class="puzzle-head"><span class="chapter-label" id="roomChapterLabel">HABITACIÓN 1 DE 3</span><div id="roomHearts" class="hearts" aria-label="5 puntos de vida">♥ ♥ ♥ ♥ ♥</div></div>
+            <h2 class="panel-title" id="roomPanelTitle">❄ &nbsp;La puerta helada</h2>
             <div class="divider-ornate"><span>✦</span></div>
+            <div class="riddle-tracker"><span id="riddleCounter">Acertijo 1/4</span><div class="riddle-pips" id="riddlePips" aria-label="Progreso de los acertijos"></div><span id="roomDifficulty">Intermedio</span></div>
             <div class="parchment-card puzzle-story">
-              <h3><span>✥</span> Enigma</h3>
-              <p>Una antigua puerta permanece sellada por hielo eterno. Descifra la invocación capaz de <strong>romper su sello</strong> y recuperar el camino al torreón.</p>
-              <p class="engraving">«Solo el elemento opuesto al frío, en el círculo preciso, hará ceder la barrera».</p>
+              <h3 id="puzzleTitle"><span>✥</span> Enigma</h3>
+              <p id="puzzleStory">Una antigua puerta permanece sellada por hielo eterno.</p>
+              <p class="engraving" id="puzzlePoem">«Solo el elemento opuesto al frío...»</p>
             </div>
             <label class="spell-label" for="spellInput">ESCRIBE TU CONJURO</label>
-            <textarea id="spellInput" spellcheck="false" maxlength="150" placeholder="¡Aethra Ignis, despierta en el..." rows="3" autocomplete="off"></textarea>
-            <div class="spell-counter"><span>Ortografía, tildes y puntuación exactas</span><span id="spellCount">0/150</span></div>
+            <textarea id="spellInput" spellcheck="false" maxlength="180" placeholder="¡Aethra Ignis, despierta en el..." rows="3" autocomplete="off"></textarea>
+            <div class="spell-counter"><span id="inputHelp">Puedes omitir tildes, mayúsculas y signos</span><span id="spellCount">0/180</span></div>
             <div class="game-actions">
               <button type="button" class="arcane-button secondary small" id="openGrimoire">▣ Grimorio</button>
               <button type="button" class="arcane-button secondary small" id="hintButton">✧ Pista</button>
             </div>
             <button type="button" class="arcane-button primary cast-button" id="castButton"><span>✦</span> Lanzar conjuro</button>
             <div class="status-box" id="spellStatus" role="status" aria-live="polite">Escribe un conjuro completo y pulsa <strong>Lanzar</strong> para activar el AFD.</div>
-            <button class="inline-action" type="button" id="validationButton" disabled>Ver el recorrido del autómata →</button>
+            <button class="inline-action" type="button" id="validationButton" disabled>Ver el recorrido del autómata →</button><button type="button" class="arcane-button primary next-room-button" id="nextRoomButton" hidden>Continuar a la siguiente sala →</button>
           </aside>
-          <div class="room-success" id="roomSuccess" aria-live="polite" hidden><span>✧</span> ¡EL SELLO SE HA ROTO! <span>✧</span></div>
+          <div class="room-success" id="roomSuccess" aria-live="polite" hidden><span>✧</span> ¡HABITACIÓN SUPERADA! <span>✧</span></div>
         </div>
-        <p class="screen-footnote">Se requieren coincidencias exactas: un conjuro aceptado por el AFD no siempre resuelve el acertijo.</p>
+        <p class="screen-footnote">La escritura es flexible: tildes, mayúsculas y signos no afectan al AFD. Elegir la combinación correcta sí importa.</p>
       </section>
 
       <!-- GRIMORIO: referencia de elementos, sin penalización -->
@@ -118,7 +125,7 @@
           <div class="bookback-glow" aria-hidden="true"></div>
           <div class="book-decor left" aria-hidden="true">❦</div>
           <div class="book-decor right" aria-hidden="true">✥</div>
-          <header class="book-header"><span class="book-header-icon">▣</span><div><h2 id="grimoireTitle">Grimorio de Invocaciones</h2><p>El poder comienza con una sintaxis perfecta</p></div></header>
+          <header class="book-header"><span class="book-header-icon">▣</span><div><h2 id="grimoireTitle">Grimorio de Invocaciones</h2><p>Elige elemento, círculo y acción: los símbolos conservan su poder incluso sin tildes.</p></div></header>
           <div class="book">
             <section class="book-page page-left" aria-label="Invocaciones elementales">
               <div class="paper-decoration top">❧ &nbsp; ✦ &nbsp; ❧</div>
@@ -136,10 +143,10 @@
               <div class="circles"><div><span>Ⅰ</span>Primer<br />círculo</div><div><span>Ⅱ</span>Segundo<br />círculo</div><div><span>Ⅲ</span>Tercer<br />círculo</div></div>
               <h3 class="action-heading">Acciones del conjuro</h3>
               <div class="actions-list"><div><span>⚔</span> rompe el sello</div><div><span>⛨</span> detén al guardián</div><div><span>≋</span> dispersa la niebla</div></div>
-              <div class="book-formula"><span>FÓRMULA EXACTA</span><p>¡<b>INVOCACIÓN</b>, despierta en el <b>CÍRCULO</b> círculo y <b>ACCIÓN</b>!</p></div>
+              <div class="book-formula"><span>FÓRMULA CANÓNICA</span><p>¡<b>INVOCACIÓN</b>, despierta en el <b>CÍRCULO</b> círculo y <b>ACCIÓN</b>!</p></div>
             </section>
           </div>
-          <div class="grimoire-footer"><span>27 frases correctas en su forma. Solo una solución para cada sala.</span><button type="button" class="arcane-button primary" id="returnFromGrimoire">↩ Volver a la aventura</button></div>
+          <div class="grimoire-footer"><span>27 conjuros del lenguaje; distintas combinaciones resuelven cada acertijo. Se ignoran tildes, mayúsculas y signos.</span><button type="button" class="arcane-button primary" id="returnFromGrimoire">↩ Volver a la aventura</button></div>
         </div>
       </section>
 
@@ -151,7 +158,7 @@
           <div class="validation-layout">
             <div class="result-column fantasy-panel">
               <h3>✧ &nbsp; Conjuro ingresado</h3>
-              <div class="spell-scroll" id="reviewSpell">Todavía no hay una cadena evaluada.</div>
+              <div class="spell-scroll" id="reviewSpell">Todavía no hay una cadena evaluada.</div><div class="normalized-spell" id="normalizedSpell" hidden></div>
               <div class="verdict-row" id="syntaxVerdict"><span class="verdict-icon">○</span><div><strong>Validación de sintaxis</strong><p>Esperando una invocación...</p></div></div>
               <div class="verdict-row" id="puzzleVerdict"><span class="verdict-icon">○</span><div><strong>Solución del acertijo</strong><p>La regla de la sala se evalúa después del AFD.</p></div></div>
               <div class="result-report" id="validationReport">Ningún intento registrado todavía.</div>
@@ -173,22 +180,23 @@
       <section class="view" id="view-progreso" aria-labelledby="progressTitle">
         <div class="section-topline"><span>MAPA DEL TORREÓN</span><span>El camino del aprendiz</span></div>
         <div class="progress-screen fantasy-frame">
-          <div class="progress-heading"><h2 id="progressTitle">El camino del grimorio</h2><p>Tres desafíos, tres elementos y un lenguaje de 27 invocaciones.</p></div>
+          <div class="progress-heading"><h2 id="progressTitle">El camino del grimorio</h2><p id="progressHeadingDetail">Tres habitaciones, varios acertijos y un lenguaje de 27 invocaciones.</p></div>
           <div class="progress-meter"><span>PROGRESO DE LA AVENTURA</span><div class="meter-bar"><i id="progressBar"></i></div><strong id="progressText">0 de 3 habitaciones</strong></div>
           <div class="level-cards">
-            <article class="level-card unlocked"><div class="level-card-art ice-art"><span class="card-sigil">❄</span></div><div class="level-card-body"><p class="label-stage">HABITACIÓN I</p><h3>La puerta helada</h3><p>Rompe el sello glacial para recuperar el camino.</p><button class="arcane-button primary" id="playFromProgress">▶ Jugar</button></div></article>
-            <article class="level-card locked"><div class="level-card-art fire-art"><span class="card-sigil">♨</span></div><div class="level-card-body"><p class="label-stage">HABITACIÓN II</p><h3>El guardián de fuego</h3><p>Un guardián impide el paso a la torre superior.</p><span class="locked-pill">♧ Próxima entrega</span></div></article>
-            <article class="level-card locked"><div class="level-card-art mist-art"><span class="card-sigil">≋</span></div><div class="level-card-body"><p class="label-stage">HABITACIÓN III</p><h3>La cámara de niebla</h3><p>Disipa la bruma para revelar la salida oculta.</p><span class="locked-pill">♧ Próxima entrega</span></div></article>
+            <article class="level-card unlocked" id="levelCard0"><div class="level-card-art ice-art"><span class="card-sigil">❄</span></div><div class="level-card-body"><p class="label-stage">HABITACIÓN I</p><h3>La puerta helada</h3><p id="levelProgress0">Resuelve los acertijos de hielo.</p><button class="arcane-button primary" id="playFromProgress">▶ Jugar</button></div></article>
+            <article class="level-card locked" id="levelCard1"><div class="level-card-art fire-art"><span class="card-sigil">♨</span></div><div class="level-card-body"><p class="label-stage">HABITACIÓN II</p><h3>El guardián de fuego</h3><p id="levelProgress1">Un guardián impide el paso a la torre superior.</p><button type="button" class="arcane-button secondary" id="playRoom1" disabled>🔒 Bloqueada</button></div></article>
+            <article class="level-card locked" id="levelCard2"><div class="level-card-art mist-art"><span class="card-sigil">≋</span></div><div class="level-card-body"><p class="label-stage">HABITACIÓN III</p><h3>La cámara de niebla</h3><p id="levelProgress2">Disipa la bruma para revelar la salida oculta.</p><button type="button" class="arcane-button secondary" id="playRoom2" disabled>🔒 Bloqueada</button></div></article>
           </div>
-          <div class="progress-statline"><span>Intentos: <strong id="totalAttempts">0</strong></span><span>Errores sintácticos: <strong id="syntaxErrors">0</strong></span><span>Conjuros inadecuados: <strong id="puzzleErrors">0</strong></span></div>
+          <div class="progress-statline"><span>Intentos: <strong id="totalAttempts">0</strong></span><span>Errores sintácticos: <strong id="syntaxErrors">0</strong></span><span>Conjuros inadecuados: <strong id="puzzleErrors">0</strong></span><span>Modo: <strong id="progressMode">Intermedio</strong></span></div>
         </div>
       </section>
     </main>
 
     <div class="modal-backdrop" id="modalBackdrop" hidden><div class="modal fantasy-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button type="button" class="modal-close" id="modalClose" aria-label="Cerrar">×</button><h2 id="modalTitle">Pista arcana</h2><div id="modalBody"></div><div class="modal-actions"><button type="button" class="arcane-button primary" id="modalOk">Entendido</button></div></div></div>
+    <div class="tutorial-backdrop" id="tutorialBackdrop" hidden><div class="tutorial-window fantasy-panel" role="dialog" aria-modal="true" aria-labelledby="tutorialHeading"><span class="tutorial-corner">✧ MANUAL DEL APRENDIZ ✧</span><span id="tutorialPageNumber" class="tutorial-page">1 / 5</span><h2 id="tutorialHeading">Bienvenido, aprendiz</h2><div class="tutorial-track" id="tutorialTrack"></div><div class="tutorial-content" id="tutorialContent"></div><div class="tutorial-actions"><button type="button" class="arcane-button secondary small" id="tutorialSkip">Saltar tutorial</button><button type="button" class="arcane-button secondary small" id="tutorialVisit" hidden>Abrir el grimorio ▣</button><button type="button" class="arcane-button primary" id="tutorialNext">Continuar →</button></div></div></div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <footer class="site-footer"><span>✧ SpellScript · Avance de implementación</span><span>Teoría de la Computación · Universidad de Pamplona</span></footer>
   </div>
-  <script src="js/data.js"></script><script src="js/afd.js"></script><script src="js/game.js"></script><script src="js/app.js"></script>
+  <script src="js/data.js"></script><script src="js/afd.js"></script><script src="js/game.js"></script><script src="js/music.js"></script><script src="js/app.js"></script>
 </body>
 </html>

@@ -1,51 +1,82 @@
-/* El estado de partida se mantiene únicamente en memoria; sin servidor ni BD. */
-(function () {
-  'use strict';
-  const state = {
-    currentRoom: 0, lives: 5, solved: [false, false, false],
-    attempts: 0, syntaxErrors: 0, puzzleErrors: 0, restartCount: 0,
-    lastResult: null
-  };
-  function cast(rawInput) {
-    const input = String(rawInput ?? '');
-    // Un campo vacío (incluso con espacios) no cuenta como lanzamiento.
-    if (!input.trim()) return { kind: 'empty', damage: 0, message: 'Escribe primero un conjuro. No se han descontado puntos de vida.' };
-    if (state.solved[0]) return { kind: 'already-solved', damage: 0, message: 'Ya abriste esta puerta. Puedes consultar tu resultado en el AFD.' };
-    const dfa = window.SpellAFD.run(input);
-    state.attempts++;
-    let result;
-    if (!dfa.accepted) {
-      state.syntaxErrors++;
-      state.lives = Math.max(0, state.lives - 1);
-      const why = dfa.firstError.kind === 'incomplete'
-        ? `La frase terminó antes de completarse (posición ${dfa.firstError.index}).`
-        : `Carácter inesperado «${dfa.firstError.symbol}» en la posición ${dfa.firstError.index}.`;
-      result = { kind: 'syntax-error', damage: 1, message: `${why} El AFD rechaza la sintaxis. Pierdes 1 PV.`, dfa, text: input };
-    } else {
-      const { invocation, circle, action } = dfa.spell;
-      const solution = window.SpellData.rooms[0].solution;
-      if (invocation === solution.invocation && circle === solution.circle && action === solution.action) {
-        state.solved[0] = true;
-        result = { kind: 'correct', damage: 0, message: '¡Conjuro aceptado! El fuego del segundo círculo rompe el sello de hielo.', dfa, text: input };
-      } else {
-        state.puzzleErrors++;
-        state.lives = Math.max(0, state.lives - 2);
-        result = { kind: 'wrong-choice', damage: 2, message: 'El AFD aceptó la frase, pero no resuelve esta habitación. Pierdes 2 PV.', dfa, text: input };
-      }
-    }
-    if (state.lives === 0) {
-      state.restartCount++;
-      state.lives = 5;
-      result.restarted = true;
-      result.message += ' Al agotarse la vida, se reinició solo esta habitación con 5 PV.';
-    }
-    state.lastResult = result;
-    return result;
+/* Motor independiente de la interfaz; tres salas y desafíos por dificultad. */
+(function(){
+ 'use strict';
+ const D=window.SpellData;
+ const state={difficulty:'normal',currentRoom:0,lives:5,solved:[false,false,false],progress:[0,0,0],attempts:0,syntaxErrors:0,puzzleErrors:0,restartCount:0,lastResult:null,started:false,tutorialSeen:false};
+ const SAVE_KEY='spellscript-v2-save';
+ const validModes=Object.keys(D.difficulty);
+ const maxLives=()=>D.difficulty[state.difficulty].lives;
+ const totalChallenges=()=>D.difficulty[state.difficulty].riddles;
+ const currentPuzzle=()=>D.rooms[state.currentRoom].puzzles[Math.min(state.progress[state.currentRoom],totalChallenges()-1)];
+ function save(){
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify({...state,lastResult:null}));}catch(e){}
+ }
+ function restore(){
+  try{
+   const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+   if(!saved||!validModes.includes(saved.difficulty)||!Array.isArray(saved.progress)||saved.progress.length!==3)return false;
+   state.difficulty=saved.difficulty;
+   state.progress=saved.progress.map(n=>Math.max(0,Math.min(totalChallenges(),Number.isInteger(n)?n:0)));
+   state.solved=state.progress.map(n=>n>=totalChallenges());
+   state.currentRoom=Math.max(0,Math.min(2,Number(saved.currentRoom)||0));
+   state.lives=Math.max(1,Math.min(maxLives(),Number(saved.lives)||maxLives()));
+   for(const k of ['attempts','syntaxErrors','puzzleErrors','restartCount'])state[k]=Math.max(0,Number(saved[k])||0);
+   state.started=Boolean(saved.started);state.tutorialSeen=Boolean(saved.tutorialSeen);
+   return true;
+  }catch(e){return false;}
+ }
+ function resetGame(mode=state.difficulty,preserveTutorial=true){
+  state.difficulty=validModes.includes(mode)?mode:'normal';state.currentRoom=0;state.lives=maxLives();
+  state.progress=[0,0,0];state.solved=[false,false,false];state.attempts=0;state.syntaxErrors=0;state.puzzleErrors=0;state.restartCount=0;state.lastResult=null;state.started=false;
+  if(!preserveTutorial)state.tutorialSeen=false;
+  save();
+ }
+ function setDifficulty(mode){
+  if(!validModes.includes(mode))return false;
+  // Cambiar el número de pruebas altera la ruta de progresión: iniciar una partida nueva.
+  resetGame(mode,true);return true;
+ }
+ function start(){state.started=true;save();}
+ function seenTutorial(){state.tutorialSeen=true;save();}
+ function selectRoom(index){
+  if(!Number.isInteger(index)||index<0||index>2)return false;
+  if(index>0&&!state.solved[index-1])return false;
+  if(state.currentRoom!==index){state.currentRoom=index;state.lastResult=null;state.lives=maxLives();save();}
+  return true;
+ }
+ function nextRoom(){return selectRoom(state.currentRoom+1);}
+ function cast(raw){
+  const input=String(raw??'');
+  if(!input.trim())return {kind:'empty',damage:0,message:'Escribe primero tu conjuro. No perderás vidas.'};
+  const roomIndex=state.currentRoom,room=D.rooms[roomIndex];
+  if(state.solved[roomIndex])return {kind:'already-solved',damage:0,message:'Ya superaste esta habitación. Avanza a la siguiente sala.'};
+  const dfa=window.SpellAFD.run(input);
+  state.attempts++;
+  let result={dfa,text:input,roomIndex,challengeIndex:state.progress[roomIndex],damage:0};
+  if(!dfa.accepted){
+   state.syntaxErrors++;result.kind='syntax-error';result.damage=1;state.lives=Math.max(0,state.lives-1);
+   result.message=dfa.firstError.kind==='incomplete'?'Faltan palabras para completar el conjuro. El AFD rechaza la sintaxis (−1 PV).':`El AFD no reconoce la secuencia cerca de la posición ${dfa.firstError.index} (−1 PV). Consulta el grimorio.`;
+  }else{
+   const solution=currentPuzzle().solution;
+   const {invocation,circle,action}=dfa.spell;
+   if(invocation===solution.invocation&&circle===solution.circle&&action===solution.action){
+    result.kind='correct';state.progress[roomIndex]++;
+    result.completedRoom=state.progress[roomIndex]===totalChallenges();
+    if(result.completedRoom)state.solved[roomIndex]=true;
+    result.message=result.completedRoom?`¡Último sello superado! Has completado ${room.name}.`:`¡Conjuro aceptado! Enigma ${state.progress[roomIndex]} de ${totalChallenges()} superado. La magia responde a tus palabras.`;
+    result.nextIndex=state.progress[roomIndex];
+   }else{
+    state.puzzleErrors++;result.kind='wrong-choice';result.damage=2;state.lives=Math.max(0,state.lives-2);
+    result.message='La frase es válida para el AFD, pero no resuelve este acertijo (−2 PV). Relee los símbolos del altar.';
+   }
   }
-  function resetGame() {
-    state.currentRoom = 0; state.lives = 5; state.solved = [false,false,false];
-    state.attempts = 0; state.syntaxErrors = 0; state.puzzleErrors = 0;
-    state.restartCount = 0; state.lastResult = null;
+  if(state.lives===0){
+   state.restartCount++;state.lives=maxLives();state.progress[roomIndex]=0;state.solved[roomIndex]=false;
+   result.restarted=true;result.completedRoom=false;
+   result.message+=` Has agotado las vidas: reinicias esta habitación con ${maxLives()} PV y sus acertijos desde el primero.`;
   }
-  window.SpellGame = { state, cast, resetGame };
+  state.lastResult=result;save();return result;
+ }
+ restore();
+ window.SpellGame={state,maxLives,totalChallenges,currentPuzzle,cast,resetGame,setDifficulty,restore,save,start,seenTutorial,selectRoom,nextRoom};
 })();
