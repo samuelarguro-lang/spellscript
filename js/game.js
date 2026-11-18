@@ -8,6 +8,7 @@
   };
   function cast(rawInput) {
     const input = String(rawInput ?? '');
+    // Un campo vacío (incluso con espacios) no cuenta como lanzamiento.
     if (!input.trim()) return { kind: 'empty', damage: 0, message: 'Escribe primero un conjuro. No se han descontado puntos de vida.' };
     if (state.solved[0]) return { kind: 'already-solved', damage: 0, message: 'Ya abriste esta puerta. Puedes consultar tu resultado en el AFD.' };
     const dfa = window.SpellAFD.run(input);
