@@ -25,7 +25,9 @@ for(const mode of ['facil','normal','dificil']){
 }
 G.setDifficulty('normal');assert.equal(G.cast('  ').kind,'empty');assert.equal(G.state.attempts,0);
 let r=G.cast('invalid');assert.equal(r.kind,'syntax-error');assert.equal(r.damage,1);assert.equal(G.state.lives,4);
-r=G.cast(D.formulate('Zephira Ventus','tercer','dispersa la niebla'));
+const solution=G.currentPuzzle().solution;
+const wrong=D.spells.find(spell=>spell.invocation!==solution.invocation||spell.circle!==solution.circle||spell.action!==solution.action);
+r=G.cast(wrong.text);
 assert.equal(r.kind,'wrong-choice');assert.equal(r.damage,2);assert.equal(G.state.lives,2);
 // Test complete campaign in each difficulty.
 for(const mode of ['facil','normal','dificil']){

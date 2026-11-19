@@ -68,10 +68,28 @@
    note(137,now+.13,.45,.07,'triangle',700,.25);
   }
  }
+ /* Pequeñas señales sonoras de victoria. Respetan el botón de audio del usuario. */
+ function reward(kind,element){
+  if(!enabled||!context)return;
+  const now=context.currentTime+.04;
+  const root=element==='hielo'?392:element==='fuego'?329.63:element==='niebla'?440:349.23;
+  if(kind==='riddle'){
+   [1,1.25,1.5,2].forEach((ratio,i)=>note(root*ratio,now+i*.11,.6+i*.1,.07,'sine',2700,i%2?.28:-.28));
+   note(root*.5,now,.8,.035,'triangle',800,0);
+  }else if(kind==='door'){
+   note(root*.5,now,2.55,.048,'sine',750,0);
+   [1,1.25,1.5,2,2.5,3].forEach((ratio,i)=>{
+    note(root*ratio,now+.18+i*.32,1.0,.052,'sine',3000,i%2?.32:-.32);
+    if(i%2===0)note(root*ratio*2,now+.24+i*.32,.5,.013,'triangle',4000,0);
+   });
+  }else if(kind==='victory'){
+   [1,1.25,1.5,2,2.5].forEach((ratio,i)=>note(root*ratio,now+i*.18,1.5,.05,'sine',2900,i%2?.25:-.25));
+  }
+ }
  document.addEventListener('visibilitychange',()=>{
   if(!context)return;
   if(document.hidden)context.suspend().catch(()=>{});
   else if(enabled)context.resume().catch(()=>{});
  });
- window.SpellMusic={toggle,enable,disable,setTheme,setVolume,spell,isEnabled:()=>enabled,getVolume:()=>volume};
+ window.SpellMusic={toggle,enable,disable,setTheme,setVolume,spell,reward,isEnabled:()=>enabled,getVolume:()=>volume};
 })();

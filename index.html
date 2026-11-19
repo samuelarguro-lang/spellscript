@@ -55,7 +55,7 @@
               <button type="button" class="arcane-button secondary" data-go="grimorio"><span>▣</span> Consultar grimorio</button>
               <button type="button" class="arcane-button secondary" data-go="progreso"><span>✦</span> Progreso de la aventura</button><button type="button" class="tiny-tutorial-link" id="tutorialReplayHome">✧ ¿Primera vez? Ver tutorial</button>
             </div>
-<p class="home-meta">Tres habitaciones jugables · 27 conjuros · 3 dificultades</p>
+<p class="home-meta">45 acertijos posibles · 27 conjuros · 3 dificultades</p>
           </div>
           <div class="hero-inscription" aria-hidden="true">ᚨ &nbsp; ᛟ &nbsp; ᚠ</div>
           <div class="floating-crystal crystal-a" aria-hidden="true">◆</div>
@@ -67,15 +67,21 @@
 
       <!-- SALA 1: Jugable -->
       <section class="view" id="view-aventura" aria-labelledby="adventureTitle">
-        <div class="section-topline"><span>AVENTURA PRINCIPAL</span><span id="adventureChapter">Capítulo I · El grimorio perdido</span></div>
+        <div class="section-topline"><span id="adventureSectionLabel">AVENTURA PRINCIPAL</span><span id="adventureChapter">Capítulo I · El grimorio perdido</span></div>
+        <div class="archive-toolbar fantasy-panel" id="archiveToolbar" hidden>
+          <div class="archive-identity"><span class="archive-emblem">✧</span><div><strong>Archivo de la sala</strong><small>Revisa acertijos y recorridos del AFD sin consumir vidas ni alterar el progreso.</small></div></div>
+          <label for="archiveChallenge">Acertijo completado</label><select id="archiveChallenge" aria-label="Selecciona un acertijo completado"></select>
+          <button type="button" class="arcane-button primary small" id="archiveTraceButton">◇ Ver recorrido del AFD</button>
+          <button type="button" class="arcane-button secondary small" id="archiveReturnButton">↩ Volver a mi partida</button>
+        </div>
         <div class="room-screen fantasy-frame" id="roomScreen" data-room="hielo">
           <div class="room-bg" aria-hidden="true"></div>
           <div class="room-wash" aria-hidden="true"></div>
           <aside class="room-sidebar fantasy-panel">
             <p class="small-heading">PROGRESO DEL NIVEL</p>
-            <div class="room-selector" id="sidebarRoom0"><span class="room-dot active">✦</span><strong>Habitación 1</strong><span>01</span></div>
-            <div class="room-selector disabled" id="sidebarRoom1"><span class="room-dot">♧</span>Habitación 2 <span>🔒</span></div>
-            <div class="room-selector disabled" id="sidebarRoom2"><span class="room-dot">♧</span>Habitación 3 <span>🔒</span></div>
+            <button type="button" class="room-selector" id="sidebarRoom0"><span class="room-dot active">✦</span><strong>Habitación 1</strong><span>01</span></button>
+            <button type="button" class="room-selector disabled" id="sidebarRoom1" disabled><span class="room-dot">♧</span>Habitación 2 <span>🔒</span></button>
+            <button type="button" class="room-selector disabled" id="sidebarRoom2" disabled><span class="room-dot">♧</span>Habitación 3 <span>🔒</span></button>
             <div class="mini-divider"></div>
             <div class="room-detail">
               <div class="element-icon ice" id="roomElement">❄</div>
@@ -88,8 +94,21 @@
           <div class="room-illustration" aria-label="Puerta helada protegida por un sello mágico">
             <div class="snowfall" aria-hidden="true" id="snowfall"></div>
             <div class="door-aura" aria-hidden="true"></div>
-            <div class="spellcasting-scene" id="spellcastingScene" aria-hidden="true"><div class="spellcaster">✦</div><div class="spell-beam"></div><div class="spell-impact">✺</div><div class="spell-runes">✧ ✵ ✺ ✧</div></div>
+            <div class="spellcasting-scene" id="spellcastingScene" aria-hidden="true">
+              <div class="spellcaster">✦</div><div class="spell-beam"></div>
+              <div class="spell-impact">✺</div><div class="spell-runes">✧ ✵ ✺ ✧</div>
+              <div class="conjure-ring ring-outer"></div><div class="conjure-ring ring-inner"></div>
+              <div class="spell-spark-field" id="spellSparkField"></div>
+              <div class="spell-center-sigil">✧</div>
+            </div>
             <div class="cast-effect" id="castEffect" aria-hidden="true">✧</div>
+            <div class="riddle-celebration" id="riddleCelebration" aria-hidden="true" hidden><span class="celebration-star">✦</span><strong>¡ACERTIJO SUPERADO!</strong><small>El siguiente sello te espera</small></div>
+            <div class="room-portal" id="roomPortal" aria-hidden="true" hidden>
+              <div class="portal-light"></div><div class="portal-aura-ring"></div>
+              <div class="portal-half portal-left"><span>◇</span></div>
+              <div class="portal-half portal-right"><span>◇</span></div>
+              <div class="portal-shine"></div><div class="portal-caption">✦ EL PORTAL SE ABRE ✦</div>
+            </div>
             <span class="scenario-tag" id="scenarioTag">✧ EL SELLO DE GLACIES ✧</span>
           </div>
           <aside class="puzzle-panel fantasy-panel" id="puzzlePanel">
@@ -102,7 +121,7 @@
               <p id="puzzleStory">Una antigua puerta permanece sellada por hielo eterno.</p>
               <p class="engraving" id="puzzlePoem">«Solo el elemento opuesto al frío...»</p>
             </div>
-            <label class="spell-label" for="spellInput">ESCRIBE TU CONJURO</label>
+            <label class="spell-label" for="spellInput" id="spellLabel">ESCRIBE TU CONJURO</label>
             <textarea id="spellInput" spellcheck="false" maxlength="180" placeholder="¡Aethra Ignis, despierta en el..." rows="3" autocomplete="off"></textarea>
             <div class="spell-counter"><span id="inputHelp">Puedes omitir tildes, mayúsculas y signos</span><span id="spellCount">0/180</span></div>
             <div class="game-actions">
@@ -158,6 +177,7 @@
           <div class="validation-layout">
             <div class="result-column fantasy-panel">
               <h3>✧ &nbsp; Conjuro ingresado</h3>
+              <p class="archive-validation-note" id="archiveValidationNote" hidden>✦ Consulta del historial · No consume vidas</p>
               <div class="spell-scroll" id="reviewSpell">Todavía no hay una cadena evaluada.</div><div class="normalized-spell" id="normalizedSpell" hidden></div>
               <div class="verdict-row" id="syntaxVerdict"><span class="verdict-icon">○</span><div><strong>Validación de sintaxis</strong><p>Esperando una invocación...</p></div></div>
               <div class="verdict-row" id="puzzleVerdict"><span class="verdict-icon">○</span><div><strong>Solución del acertijo</strong><p>La regla de la sala se evalúa después del AFD.</p></div></div>

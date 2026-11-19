@@ -53,3 +53,23 @@ La partida usa `localStorage` cuando está disponible. No hay usuarios, servidor
 Se probaron las 27 combinaciones, entradas sin tildes ni signos, errores sintácticos y conjuros incorrectos, el modo Fácil/Intermedio/Difícil, el reinicio de una habitación al quedarse sin vidas y el guardado/recuperación del estado. También se realizaron revisiones visuales de menú, grimorio, las tres salas y animación de lanzamiento en escritorio y móvil. Se corrigieron dos errores detectados durante la primera revisión del prototipo ampliado: un identificador faltante en el mapa y una referencia incorrecta a la función de efectos ambientales.
 
 La música necesita un gesto del usuario para comenzar, conforme a las restricciones habituales de reproducción automática. La variante con una IA externa fue descartada por innecesaria: la normalización y el AFD cumplen el requisito sin coste, dependencia ni interpretaciones ambiguas.
+
+---
+
+## X. Actualización del avance — SpellScript V3 (para revisión)
+
+### Ampliación del banco de acertijos
+
+Se mantienen los 27 conjuros sintácticamente válidos. El catálogo narrativo pasa de cinco retos por sala a quince por sala (45 en total). `game.js` genera una secuencia variable y la almacena como índices en `state.plans`; `getPuzzle` resuelve cada identificador en el banco de `data.js`. La selección mantiene el orden de la campaña en el almacenamiento local y rota los retos utilizados al comenzar otra campaña. Esto permite que una misma habitación plantee problemas diferentes sin modificar el alfabeto ni el autómata.
+
+### Archivo de una sala superada
+
+`state.history` conserva intentos reales por sala con la cadena introducida, índice y tipo de resultado. `roomArchive` organiza los aciertos y `replayEntry` reconstruye el AFD con `SpellAFD.run` para mostrar sus transiciones. Esta consulta no llama a `cast`, por lo que no modifica la vida, los intentos ni el progreso. En migraciones de partidas V2 sin historial se identifica expresamente la cadena ilustrativa como ejemplo canónico.
+
+### Efectos audiovisuales
+
+`app.js` organiza los tiempos de lanzamiento, recompensa y apertura del portal. `styles.css` implementa las partículas, círculos de conjuración, resplandor y separación de las dos puertas. `music.js` sintetiza señales musicales cortas con Web Audio, en coherencia con las ambientaciones originales. No se incluyen pistas comerciales ni se requiere conexión a Internet.
+
+### Validación
+
+Las pruebas del motor verifican 27/27 conjuros, tres dificultades, selección variable, historial, persistencia, reinicio local y las tres campañas. Se verificaron las pantallas principales en Chromium mediante renderizado offline del HTML, CSS, JS e imágenes del mismo proyecto, con capturas de 1440 × 900, 390 × 844, 360 × 800, 768 × 1024 y 1280 × 720. No se registraron errores de JavaScript ni desbordamientos horizontales en esos casos. El historial fue comprobado sin cambios en vidas o progreso. La publicación pública de V3 queda pendiente de autorización.

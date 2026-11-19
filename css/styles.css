@@ -93,3 +93,72 @@ main{width:min(100%,1770px);margin:auto;padding:24px clamp(16px,3vw,48px) 0;min-
 @media(max-width:720px){.home-screen{min-height:780px}.home-copy{padding:21px 15px 28px}.difficulty-home{margin:9px auto;padding:8px}.difficulty-description{font-size:10px}.difficulty-option{font-size:11px}.room-screen{min-height:0}.room-bg{background-size:auto 515px}.room-screen[data-room="fuego"] .room-bg,.room-screen[data-room="niebla"] .room-bg{background-size:auto 515px;background-position:center top;background-repeat:no-repeat}.room-screen[data-room="niebla"] .room-wash,.room-screen[data-room="fuego"] .room-wash{background:linear-gradient(0deg,#100d2be8 40%,transparent 85%)}.room-screen .puzzle-panel{margin:0 9px 16px;padding:15px;gap:10px}.room-illustration{min-height:260px}.riddle-tracker{flex-wrap:wrap}.scenario-tag{font-size:10px;bottom:6px}.spellcasting-scene{inset:0;z-index:9}.spellcaster{font-size:55px;left:11%;top:40%}.spell-impact{font-size:85px;left:52%;top:32%}.spell-beam{top:51%;left:17%}.spell-runes{top:22%;font-size:24px;letter-spacing:9px}.tutorial-window{padding:19px 15px 18px;max-height:96vh}.tutorial-window h2{font-size:25px}.tutorial-content{padding:13px;min-height:215px}.tutorial-copy{font-size:14px}.tutorial-glyph{font-size:52px}.tutorial-actions{gap:7px;justify-content:space-between}.tutorial-actions #tutorialSkip{margin-right:0}.tutorial-actions button{min-height:40px;font-size:11px;padding:7px 9px}.settings-fields .settings-row{flex-wrap:wrap}.progress-screen{min-height:0}.game-actions .arcane-button{font-size:12px;padding:8px}.next-room-button{font-size:12px!important}}
 @media(prefers-reduced-motion:reduce){.spellcasting-scene *{animation:none!important}.spellcasting-scene{display:none!important}}
 body.reduce-motion .spellcasting-scene{display:none!important}
+/* SpellScript V3 — archivo interactivo y efectos de invocación cinematográficos.
+   Se conserva la estética original: oro, amatista y escenarios originales. */
+.room-selector{width:100%;font:inherit;text-align:left;color:#d6c9df;background:transparent;border:0;border-bottom:1px solid rgba(174,141,98,.27);cursor:pointer;transition:background .2s,box-shadow .2s}
+.room-selector:not(:disabled):hover,.room-selector.selected-archive-room{background:linear-gradient(90deg,#653589b5,#251f4e9c);box-shadow:inset 0 0 0 1px #be9bea88}
+.room-selector:disabled{cursor:not-allowed}
+.archive-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:11px;padding:13px 16px;margin:0 0 15px;background:linear-gradient(100deg,#24133feF,#14162fFA);border-color:#bd965e;box-shadow:0 0 30px #6840ad52}
+.archive-identity{display:flex;gap:9px;align-items:center;margin-right:auto;min-width:min(100%,265px)}
+.archive-identity strong{color:#ffe1ab;display:block;font-size:17px}.archive-identity small{color:#c5b9da;font:11px/1.35 Arial,sans-serif;display:block;margin-top:4px;max-width:320px}
+.archive-emblem{font-size:30px;color:#e6b7fc;text-shadow:0 0 14px #a24ff2}
+.archive-toolbar label{font:12px Arial,sans-serif;color:#d7bddc}.archive-toolbar select{appearance:auto;min-height:39px;max-width:265px;min-width:160px;padding:8px 10px;background:#201536;color:#f4e6cb;border:1px solid #ba946b;border-radius:5px;cursor:pointer}
+.archive-toolbar .arcane-button{font-size:12px;min-height:39px;padding:8px 12px}
+.archive-validation-note{border-radius:6px;border:1px solid #c4a36d8c;background:#4b2c675c;color:#f5d5fa;font:12px/1.4 Arial,sans-serif;padding:9px;text-align:center;margin:0 0 12px}
+.room-screen.reviewing .room-bg{filter:brightness(.74) saturate(1.15)}
+.room-screen.reviewing .room-illustration:after{content:'✧ ARCHIVO DE LA MEMORIA ✧';position:absolute;top:16px;left:50%;transform:translateX(-50%);white-space:nowrap;border:1px solid #f5d39a99;padding:9px 14px;border-radius:24px;background:#1b163bd8;color:#f0d3fc;letter-spacing:2px;font:12px Georgia,serif;z-index:8}
+.room-screen.reviewing #spellInput{opacity:.88;background:#dfd5ee;color:#372343}
+.room-screen.reviewing .room-success{display:none}
+.room-screen.spell-charging .room-illustration{filter:brightness(1.12)}
+.room-screen.casting .spellcasting-scene{opacity:1;animation:casting-light 1.68s ease-in-out both}
+@keyframes casting-light{0%{background:transparent}45%{background:radial-gradient(circle at 62% 48%,color-mix(in srgb,var(--cast-color) 22%,transparent),transparent 54%)}72%{background:radial-gradient(circle at 62% 48%,color-mix(in srgb,var(--cast-color) 43%,transparent),transparent 71%)}100%{background:transparent}}
+.room-screen.casting .spellcaster{animation:caster-v3 1.63s ease-in-out both}
+.room-screen.casting .spell-beam{animation:beam-v3 1.62s cubic-bezier(.34,.05,.42,1) both;height:9px;transform:rotate(-11deg);background:linear-gradient(90deg,transparent,var(--cast-color) 30%,#fffad8 65%,var(--cast-color));filter:drop-shadow(0 0 14px var(--cast-color))}
+.room-screen.casting .spell-impact{animation:impact-v3 1.62s ease-out both;color:var(--cast-color)}
+.room-screen.casting .spell-runes{animation:runes-v3 1.68s ease-out both}
+.room-screen.casting .cast-effect{animation:spell-blast-v3 1.65s ease-out both;color:var(--cast-color);font-size:120px}
+.conjure-ring{position:absolute;left:62%;top:44%;width:230px;height:230px;margin:-115px 0 0 -115px;border-radius:50%;border:4px solid var(--cast-color,#bc6cff);box-shadow:0 0 13px var(--cast-color),inset 0 0 22px var(--cast-color),0 0 45px #b777fb8f;opacity:0;transform:scale(.05);pointer-events:none}
+.conjure-ring::after{content:'✧   ✦   ✧   ✦   ✧   ✦';position:absolute;inset:14px;border-radius:50%;border:2px dashed var(--cast-color);display:grid;place-items:center;font-size:22px;letter-spacing:7px;color:#fff6dd;text-shadow:0 0 11px var(--cast-color)}
+.ring-inner{width:134px;height:134px;margin:-67px 0 0 -67px;border-width:3px;box-shadow:0 0 30px var(--cast-color)}
+.ring-inner::after{inset:8px;font-size:18px;letter-spacing:2px;content:'✧ ✦ ✧'}
+.room-screen.casting .ring-outer{animation:arcane-orbit-v3 1.65s ease-in-out both}
+.room-screen.casting .ring-inner{animation:arcane-inner-v3 1.65s ease-in-out both}
+.spell-center-sigil{position:absolute;left:62%;top:44%;font-size:62px;color:#fff7d7;transform:translate(-50%,-50%) scale(.1);opacity:0;text-shadow:0 0 13px var(--cast-color),0 0 24px var(--cast-color),0 0 48px var(--cast-color)}
+.room-screen.casting .spell-center-sigil{animation:sigil-v3 1.6s ease-in-out both}
+.spell-spark-field{position:absolute;inset:0;pointer-events:none}.spell-spark{position:absolute;left:62%;top:44%;width:var(--size,4px);height:var(--size,4px);border-radius:50%;background:#fff9e7;opacity:0;box-shadow:0 0 9px 2px var(--cast-color);transform:translate(0,0);animation:none}
+.room-screen.casting .spell-spark{animation:spark-flight-v3 1.35s ease-out var(--delay,0ms) both}
+@keyframes caster-v3{0%{opacity:0;transform:translate(-25px,25px) scale(.3) rotate(-30deg)}12%,45%{opacity:1}38%{transform:translate(0,-15px) scale(.9) rotate(12deg)}66%{opacity:.95;transform:translate(35px,-23px) scale(1.3) rotate(70deg)}100%{opacity:0;transform:translate(80px,-15px) scale(.6) rotate(105deg)}}
+@keyframes beam-v3{0%,32%{opacity:0;width:0}45%{opacity:1;width:17%}75%{opacity:1;width:48%}100%{opacity:0;width:49%}}
+@keyframes impact-v3{0%,48%{opacity:0;transform:scale(.1) rotate(-35deg)}67%{opacity:1;transform:scale(.7) rotate(35deg)}100%{opacity:0;transform:scale(2.2) rotate(210deg)}}
+@keyframes runes-v3{0%,16%{opacity:0;transform:translateY(35px) rotate(-17deg)}45%{opacity:1}100%{opacity:0;transform:translateY(-130px) rotate(28deg)}}
+@keyframes arcane-orbit-v3{0%{opacity:0;transform:scale(.08) rotate(-90deg)}23%{opacity:.9;transform:scale(.64) rotate(0)}49%{opacity:1;transform:scale(1) rotate(165deg)}75%{opacity:1;transform:scale(1.25) rotate(300deg)}100%{opacity:0;transform:scale(1.8) rotate(470deg)}}
+@keyframes arcane-inner-v3{0%,7%{opacity:0;transform:scale(.1) rotate(90deg)}31%,74%{opacity:.96;transform:scale(1) rotate(-125deg)}100%{opacity:0;transform:scale(1.6) rotate(-320deg)}}
+@keyframes sigil-v3{0%,15%{opacity:0;transform:translate(-50%,-50%) scale(.1) rotate(-90deg)}46%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}72%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(2.1) rotate(90deg)}}
+@keyframes spark-flight-v3{0%,25%{opacity:0;transform:translate(0,0) scale(.25)}40%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2)}}
+@keyframes spell-blast-v3{0%,37%{opacity:0;transform:translate(-50%,-50%) scale(.1) rotate(-80deg)}60%{opacity:.85;transform:translate(-50%,-50%) scale(.75) rotate(60deg)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.7) rotate(220deg)}}
+.riddle-celebration{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:10;min-width:235px;max-width:90%;padding:18px 17px;background:linear-gradient(135deg,#0b4633f3,#1b2745f1);border:2px solid #bbefb6;border-radius:11px;text-align:center;color:#e3ffe1;box-shadow:0 0 22px #62ef9999,0 0 70px #e7cf7677;pointer-events:none}
+.riddle-celebration strong{font-size:19px;display:block;text-shadow:0 0 13px #4feb89}.riddle-celebration small{font-size:12px;color:#d2eccc;display:block;margin-top:7px}
+.celebration-star{font-size:40px;color:#ffe5aa;display:block;text-shadow:0 0 12px #ffd75b;line-height:1}
+.riddle-celebration.burst{animation:congratulate-v3 1.68s ease-out both}
+@keyframes congratulate-v3{0%{opacity:0;transform:translate(-50%,-42%) scale(.5)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.11)}50%,78%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-69%) scale(.98)}}
+/* Portal: hojas de piedra se separan para mostrar una luz creciente. */
+.room-portal{position:absolute;z-index:11;inset:4% 7% 7%;overflow:hidden;pointer-events:none;border-radius:48% 48% 10px 10px/18% 18% 10px 10px;border:6px solid #bfa06b;box-shadow:0 0 0 9px #261c42a9,0 0 30px #d6b6fcba,inset 0 0 80px #fff7d6;isolation:isolate;background:#2e2150}
+.room-portal .portal-light{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 48%,#fffbe5 0,#ffeeb6 15%,#f6aa6c 37%,#814ace 60%,#21173b 92%);box-shadow:inset 0 0 30px #fff;animation:portal-light-v3 3.1s ease-out both}
+.portal-aura-ring{position:absolute;z-index:4;left:50%;top:48%;width:205px;height:205px;margin:-100px;border:3px dashed #fff0b9;border-radius:50%;box-shadow:0 0 28px #fff6d7;color:#fff;animation:portal-ring-v3 3.1s both;pointer-events:none}
+.portal-aura-ring:before{content:'✦';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:76px;text-shadow:0 0 30px #fff,0 0 70px #f8d279}
+.portal-half{position:absolute;z-index:5;top:0;width:51%;height:100%;background:repeating-linear-gradient(0deg,transparent 0 85px,#d0b69a3b 86px 92px,transparent 94px 130px),linear-gradient(100deg,#151834,#30365d 35%,#171a39 80%,#4b3770);border:4px solid #e5bd76;box-shadow:inset 0 0 25px #9163d4,0 0 18px #090611;border-radius:42% 8% 8% 5%/9% 3% 3% 3%}
+.portal-half span{position:absolute;top:39%;font-size:75px;color:#f5ddab;text-shadow:0 0 15px #cc83f0}
+.portal-left{left:0;transform-origin:left center;animation:portal-left-v3 3.1s cubic-bezier(.2,.1,.3,1) both}.portal-right{right:0;transform-origin:right center;animation:portal-right-v3 3.1s cubic-bezier(.2,.1,.3,1) both}
+.portal-left span{right:13px}.portal-right span{left:13px}
+.portal-shine{position:absolute;z-index:7;inset:0;background:radial-gradient(circle,#fffffcdb,#fffada0a 40%,transparent 65%);opacity:0;animation:portal-shine-v3 3.1s ease both}
+.portal-caption{position:absolute;z-index:8;bottom:11%;left:50%;transform:translateX(-50%);font:bold 19px Georgia,serif;white-space:nowrap;color:#fff9d5;text-shadow:0 0 20px #5b1b94,0 0 32px #f5a64b;background:#2c1c55c9;border:1px solid #e5b66d;border-radius:25px;padding:10px 20px;opacity:0;animation:portal-caption-v3 3.1s ease both}
+@keyframes portal-left-v3{0%,10%{transform:perspective(450px) rotateY(0) translateX(0)}80%,100%{transform:perspective(450px) rotateY(-39deg) translateX(-88%)}}
+@keyframes portal-right-v3{0%,10%{transform:perspective(450px) rotateY(0) translateX(0)}80%,100%{transform:perspective(450px) rotateY(39deg) translateX(88%)}}
+@keyframes portal-light-v3{0%{filter:brightness(.3)}30%{filter:brightness(.8)}70%{filter:brightness(2)}100%{filter:brightness(1.45)}}
+@keyframes portal-ring-v3{0%,9%{opacity:0;transform:scale(.2) rotate(-70deg)}45%{opacity:1;transform:scale(.9) rotate(40deg)}100%{opacity:0;transform:scale(2.8) rotate(260deg)}}
+@keyframes portal-shine-v3{0%,50%{opacity:0}75%{opacity:.7}100%{opacity:.06}}
+@keyframes portal-caption-v3{0%,55%{opacity:0;transform:translate(-50%,20px)}70%,100%{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:1050px){.archive-toolbar .archive-identity{flex:1 1 100%}.archive-toolbar select{flex:1;max-width:none}}
+@media(max-width:720px){.archive-toolbar{padding:12px;gap:9px}.archive-toolbar .archive-identity{width:100%}.archive-toolbar label{width:100%}.archive-toolbar select{width:100%;max-width:none}.archive-toolbar .arcane-button{flex:1 1 45%;font-size:11px}.room-portal{inset:1% 8% 4%;border-width:3px}.portal-caption{font-size:12px;bottom:12%;padding:7px 11px}.portal-aura-ring{width:130px;height:130px;margin:-65px}.conjure-ring{left:57%;top:40%;width:160px;height:160px;margin:-80px}.ring-inner{width:86px;height:86px;margin:-43px}.spell-center-sigil,.spell-spark{left:57%;top:40%}.conjure-ring::after{font-size:13px;letter-spacing:3px}.riddle-celebration{min-width:210px;top:43%;padding:12px}.riddle-celebration strong{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.room-portal *,.riddle-celebration,.conjure-ring,.spell-spark{animation-duration:.01ms!important}.portal-half.portal-left{transform:translateX(-88%)}.portal-half.portal-right{transform:translateX(88%)}.portal-caption{opacity:1}}
+body.reduce-motion .room-portal *{animation-duration:.01ms!important}body.reduce-motion .portal-half.portal-left{transform:translateX(-88%)}body.reduce-motion .portal-half.portal-right{transform:translateX(88%)}body.reduce-motion .portal-caption{opacity:1}
