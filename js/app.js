@@ -11,6 +11,7 @@
  let route='inicio',previousRoute='aventura',reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  let busy=false,toastTimer=null,transitionTimer=null,visitedGrimoire=false,tutorialStep=0,tutorialOpen=false,returnFromTutorial=false;
  let reviewRoomIndex=null,reviewChallengeIndex=0,archiveResult=null,doorOpening=false;
+ let practiceRoom=0,educationResult=null,selectedPracticeId=null,tutorialPracticeDone=false;
  const shownRoomIndex=()=>reviewRoomIndex===null?state.currentRoom:reviewRoomIndex;
  const isReviewing=()=>reviewRoomIndex!==null;
  const modeInfo=()=>D.difficulty[state.difficulty];
@@ -25,6 +26,7 @@
   if(!$('#view-'+target))return;
   if((busy||doorOpening)&&target!==route){toast('✧ Espera a que el conjuro termine su animación.');return;}
   if(target==='grimorio'&&route!=='grimorio')previousRoute=route;
+  if(route==='validacion'&&target!=='validacion')window.SpellAFDView.pause();
   route=target;
   $$('.view').forEach(view=>view.classList.toggle('active',view.id==='view-'+route));
   $$('.main-nav .nav-item').forEach(el=>el.classList.toggle('active',el.dataset.go===route||(route==='validacion'&&el.dataset.go==='aventura')));
@@ -32,7 +34,9 @@
   if(route==='aventura')renderRoom();
   if(route==='validacion')renderValidation();
   if(route==='progreso')renderProgress();
-  M.setTheme(route==='aventura'||route==='validacion'?D.rooms[shownRoomIndex()].id:'inicio');
+  if(route==='practica')renderPractice();
+  if(route==='grimorio')renderLearningStats();
+  M.setTheme(route==='aventura'||route==='validacion'?D.rooms[shownRoomIndex()].id:route==='practica'?D.rooms[practiceRoom].id:'inicio');
   window.scrollTo({top:0,behavior:'instant'});
   $('#mainContent').focus({preventScroll:true});
  }
@@ -88,17 +92,20 @@
   {icon:'▣',title:'Consulta tu grimorio',eyebrow:'02 · EL MANUAL MÁGICO',body:'Antes de invocar nada, abre el <strong>grimorio real del juego</strong>. Allí conocerás las tres invocaciones, los círculos y las acciones. Después vuelve a este tutorial.'},
   {icon:'✦',title:'Construye un conjuro',eyebrow:'03 · EL LENGUAJE REGULAR',body:'La estructura siempre tiene tres decisiones: <strong>elemento + círculo + acción</strong>. Ejemplo:<div class="tutorial-spell">¡Aethra Ignis, despierta en el segundo círculo y rompe el sello!</div>Es válido escribirlo <strong>sin tildes, sin signos o en minúsculas</strong>.'},
   {icon:'◇',title:'El AFD y tus vidas',eyebrow:'04 · CÓMO GANAR',body:'Un AFD lee el conjuro carácter por carácter después de normalizarlo. Si la sintaxis falla, pierdes <strong>1 vida</strong>. Si el hechizo es válido pero no resuelve el enigma, pierdes <strong>2 vidas</strong>. Si aciertas, avanzas al siguiente acertijo.'},
-  {icon:'⚔',title:'¡Ya puedes comenzar!',eyebrow:'05 · LISTO PARA LANZAR',body:'Lee la escena, consulta pistas y prueba las invocaciones. Pulsa <strong>Grimorio</strong> siempre que lo necesites. El botón de música activa una banda sonora suave que cambia según la sala. ¡Abre el primer sello!'}
+  {icon:'✎',title:'Comas y conectores',eyebrow:'05 · ESCRITURA EN ESPAÑOL',body:'La aventura clásica admite signos opcionales, pero en el <strong>Taller de escritura</strong> deberás respetar los conectores y comas indicados. Por ejemplo, «Si el hielo se derrite, podremos entrar» lleva coma después de la condición inicial.'},
+  {icon:'◇',title:'Aprende de los errores',eyebrow:'06 · TUTOR DEL AFD',body:'En el panel del autómata verás de dónde sale una transición, <strong>qué símbolo lee</strong>, a qué estado llega y cómo corregir el error. El grimorio incluye <strong>Mi progreso como escritor</strong> y recomendaciones basadas en tus prácticas.'},
+  {icon:'✦',title:'Una práctica antes de salir',eyebrow:'07 · PRÁCTICA INTERACTIVA',body:'Completa la frase del taller escribiendo una coma: <strong>«Si hay hielo, caminaremos despacio.»</strong><div class="tutorial-mini"><label for="tutorialMiniInput">Completa: «Si hay hielo caminaremos despacio.»</label><input id="tutorialMiniInput" type="text" placeholder="Escribe aquí la oración corregida" autocomplete="off"><button type="button" id="tutorialMiniCheck" class="arcane-button secondary small">✓ Comprobar sin perder vidas</button><p id="tutorialMiniMessage" role="status">Practicar es opcional, pero te prepara para el AFD educativo.</p></div>'},
+  {icon:'⚔',title:'¡Ya puedes comenzar!',eyebrow:'08 · LISTO PARA LANZAR',body:'Lee el acertijo, consulta el grimorio y utiliza pistas sin penalización. Los retos tradicionales siguen intactos y las prácticas son opcionales. ¡Abre el primer sello!'}
  ];
  function showTutorial(step=tutorialStep){
-  tutorialStep=Math.max(0,Math.min(4,step));tutorialOpen=true;
+  tutorialStep=Math.max(0,Math.min(tutorialPages.length-1,step));tutorialOpen=true;
   const item=tutorialPages[tutorialStep];
   $('#tutorialBackdrop').hidden=false;
   $('#tutorialHeading').textContent=item.title;
-  $('#tutorialPageNumber').textContent=`${tutorialStep+1} / 5`;
+  $('#tutorialPageNumber').textContent=`${tutorialStep+1} / ${tutorialPages.length}`;
   $('#tutorialTrack').innerHTML=tutorialPages.map((_,i)=>`<span class="${i<=tutorialStep?'active':''}"></span>`).join('');
   $('#tutorialContent').innerHTML=`<div class="tutorial-glyph">${item.icon}</div><p class="tutorial-eyebrow">${item.eyebrow}</p><div class="tutorial-copy">${item.body}</div>`;
-  $('#tutorialNext').textContent=tutorialStep===4?'▶ Entrar a la aventura':'Continuar →';
+  $('#tutorialNext').textContent=tutorialStep===tutorialPages.length-1?'▶ Entrar a la aventura':'Continuar →';
   $('#tutorialNext').disabled=tutorialStep===1&&!visitedGrimoire;
   $('#tutorialVisit').hidden=tutorialStep!==1;
   $('#tutorialSkip').textContent='Saltar tutorial';
@@ -181,7 +188,8 @@
  function makeSpellSparks(){
   const field=$('#spellSparkField');field.replaceChildren();
   if(reducedMotion)return;
-  for(let i=0;i<34;i++){
+  const sparkCount=window.innerWidth<=720?18:30;
+  for(let i=0;i<sparkCount;i++){
    const spark=document.createElement('i');spark.className='spell-spark';
    const angle=(i*137.5)*Math.PI/180;
    const radius=45+(i%7)*22;
@@ -268,22 +276,25 @@
  }
  function verdict(element,type,title,desc){const icons={ok:'✓',bad:'✕',neutral:'!'};element.className='verdict-row '+type;element.querySelector('.verdict-icon').textContent=icons[type];element.querySelector('strong').textContent=title;element.querySelector('p').textContent=desc;}
  function renderValidation(){
-  const r=isReviewing()?archiveResult:state.lastResult;
-  $('#archiveValidationNote').hidden=!isReviewing();
-  if(isReviewing())$('#archiveValidationNote').textContent=archiveResult?.source==='ejemplo'
+  const r=educationResult||(isReviewing()?archiveResult:state.lastResult);
+  $('#archiveValidationNote').hidden=!isReviewing()&&!educationResult;
+  if(educationResult)$('#archiveValidationNote').textContent='✎ Taller de escritura · Reconocimiento didáctico sin puntos de vida';
+  if(isReviewing()&&!educationResult)$('#archiveValidationNote').textContent=archiveResult?.source==='ejemplo'
    ?'✧ Ejemplo de referencia de una partida antigua · Sin consumir vidas'
    :'✧ Archivo de '+D.rooms[reviewRoomIndex].name+' · Conjuro guardado · Sin gastar vidas';
-  if(!r?.dfa){$('#reviewSpell').textContent='Primero lanza un conjuro desde una habitación.';$('#normalizedSpell').hidden=true;$('#dfaChain').innerHTML=summarizeNodes(null);$('#traceScroller').textContent='Todavía no hay transiciones.';$('#transitionCount').textContent='0 transiciones';$('#validationReport').textContent='El registro comienza tras un intento de conjuro.';return;}
+  if(!r?.dfa){$('#reviewSpell').textContent='Primero lanza un conjuro desde una habitación o realiza una práctica.';$('#normalizedSpell').hidden=true;$('#dfaChain').innerHTML=summarizeNodes(null);$('#transitionCount').textContent='0 transiciones';$('#validationReport').textContent='El registro comienza tras un intento de conjuro.';$('#afdCompare').hidden=true;window.SpellAFDView.render(null);return;}
   $('#reviewSpell').textContent=r.text;
   $('#normalizedSpell').hidden=false;
   $('#normalizedSpell').textContent='Forma normalizada que leyó el AFD: '+r.dfa.normalized;
   $('#dfaChain').innerHTML=summarizeNodes(r);
   $('#transitionCount').textContent=`${r.dfa.trace.length} transiciones`;
   $('#traceScroller').innerHTML=r.dfa.trace.map(step=>`<div class="trace-row ${step.rejected?'rejected':''}"><span>#${step.position}</span><span class="char">${safe(step.symbol===' '?'␣ espacio':step.symbol)}</span><span>${safe(step.from)}</span><span>→ ${safe(step.to)}</span></div>`).join('');
-  if(r.dfa.accepted){verdict($('#syntaxVerdict'),'ok','Sintaxis aceptada','La cadena normalizada pertenece al lenguaje regular.');verdict($('#puzzleVerdict'),r.kind==='correct'?'ok':'bad',r.kind==='correct'?'¡Acertijo resuelto!':'Conjuro inadecuado',r.kind==='correct'?'El AFD aceptó y las reglas del enigma coinciden.':'El AFD aceptó, pero la combinación no corresponde al enigma.');}
-  else{verdict($('#syntaxVerdict'),'bad','Sintaxis rechazada',r.dfa.firstError.kind==='incomplete'?'La frase está incompleta.':`No se reconoce el carácter en la posición ${r.dfa.firstError.index}.`);verdict($('#puzzleVerdict'),'neutral','Acertijo no evaluado','Primero debes superar el reconocimiento formal.');}
+  if(r.dfa.accepted){verdict($('#syntaxVerdict'),'ok','Sintaxis aceptada','La cadena normalizada pertenece al lenguaje regular.');verdict($('#puzzleVerdict'),r.kind==='correct'?'ok':'bad',r.educational?'¡Práctica correcta!':r.kind==='correct'?'¡Acertijo resuelto!':'Conjuro inadecuado',r.educational?'La expresión respeta la estructura configurada en el AFD educativo.':r.kind==='correct'?'El AFD aceptó y las reglas del enigma coinciden.':'El AFD aceptó, pero la combinación no corresponde al enigma.');}
+  else{verdict($('#syntaxVerdict'),'bad','Sintaxis rechazada',r.dfa.firstError.kind==='incomplete'?'La frase está incompleta.':`No se reconoce el carácter en la posición ${r.dfa.firstError.index}.`);verdict($('#puzzleVerdict'),'neutral',r.educational?'Ejercicio sin completar':'Acertijo no evaluado',r.educational?'Lee la corrección del tutor del AFD y vuelve a practicar.':'Primero debes superar el reconocimiento formal.');}
   $('#validationReport').textContent=`Estado: ${r.dfa.endState} · AFD: ${r.dfa.accepted?'ACEPTA':'RECHAZA'} · Comprobación independiente: ${r.dfa.byRegex?'ACEPTA':'RECHAZA'} · Coinciden: ${r.dfa.accepted===r.dfa.byRegex?'SÍ':'NO'} · Daño: ${r.damage} PV.`;
-  $('#continueFromValidation').textContent=isReviewing()?'← Volver a la sala revisada':state.solved[state.currentRoom]?'Ver progreso →':'Continuar aventura →';
+  $('#continueFromValidation').textContent=r.educational?'← Volver a la práctica':isReviewing()?'← Volver a la sala revisada':state.solved[state.currentRoom]?'Ver progreso →':'Continuar aventura →';
+  $('#afdCompare').hidden=!r.educational;$('#afdComparison').hidden=true;
+  window.SpellAFDView.render(r);
  }
  function renderProgress(){
   const total=G.totalChallenges()*3,completed=state.progress.reduce((a,b)=>a+b,0),won=state.solved.filter(Boolean).length;
@@ -304,16 +315,56 @@
  function makeAmbientEffects(){
   const container=$('#snowfall');container.replaceChildren();if(reducedMotion)return;
   const room=D.rooms[shownRoomIndex()];
-  for(let i=0;i<29;i++){
+  const ambientCount=window.innerWidth<=720?18:29;
+  for(let i=0;i<ambientCount;i++){
    const particle=document.createElement('span');particle.className=`snowflake atmosphere-${room.id}`;
    particle.textContent=room.id==='hielo'?(i%3===0?'❄':'·'):room.id==='fuego'?(i%5===0?'✦':'•'):(i%4===0?'✧':'·');
    particle.style.setProperty('--x',((i*41+12)%100)+'%');particle.style.setProperty('--size',(8+i%9)+'px');particle.style.setProperty('--speed',(7+i%7)+'s');particle.style.setProperty('--delay',(-i*1.23)+'s');particle.style.setProperty('--wind',((i%2?-1:1)*(23+i%50))+'px');container.appendChild(particle);
   }
  }
- function makeParticles(){const container=$('#particles');container.replaceChildren();if(reducedMotion)return;for(let i=0;i<27;i++){const el=document.createElement('i');el.className='particle';el.style.left=((i*37+13)%99)+'%';el.style.top=((i*29+17)%98)+'%';el.style.setProperty('--duration',(8+i%9)+'s');el.style.setProperty('--delay',(-i*.7)+'s');el.style.setProperty('--drift',(-28+i%8*9)+'px');container.appendChild(el);}}
+ function makeParticles(){const container=$('#particles');container.replaceChildren();if(reducedMotion)return;const count=window.innerWidth<=720?16:27;for(let i=0;i<count;i++){const el=document.createElement('i');el.className='particle';el.style.left=((i*37+13)%99)+'%';el.style.top=((i*29+17)%98)+'%';el.style.setProperty('--duration',(8+i%9)+'s');el.style.setProperty('--delay',(-i*.7)+'s');el.style.setProperty('--drift',(-28+i%8*9)+'px');container.appendChild(el);}}
  function setReducedMotion(value){reducedMotion=Boolean(value);document.body.classList.toggle('reduce-motion',reducedMotion);makeParticles();makeAmbientEffects();}
+
+ function renderLearningStats(){
+  const stats=window.SpellLearningProgress.stats(),slots=$('#learningStats');if(!slots)return;
+  const skills=['estructura','conectores','puntuación'];
+  slots.innerHTML=`<div class="learning-kpis"><div><strong>${stats.attempts}</strong><span>Intentos de práctica</span></div><div><strong>${stats.completed}</strong><span>Ejercicios diferentes resueltos</span></div><div><strong>${stats.corrections}</strong><span>Correcciones tras un error</span></div><div><strong>${stats.help}</strong><span>Pistas consultadas</span></div></div><div class="learning-skills">${skills.map(skill=>{const s=stats.skills[skill];return `<div><span>${safe(skill)}</span><strong>${s.correct} / ${s.attempts} respuestas correctas</strong><div class="learning-meter"><i style="width:${s.attempts?Math.round(s.correct/s.attempts*100):0}%"></i></div></div>`;}).join('')}</div>`;
+  const completed=window.SpellLearningProgress.getAttempts().filter(a=>a.accepted).map(a=>a.id);
+  const seen=new Set(completed),conns=['porque','aunque','por eso'];
+  $('#learningConnectors').innerHTML='<strong>Conectores practicados:</strong> '+conns.map(conn=>{const list=window.SpellWritingRules.exercises.filter(ex=>seen.has(ex.id)&&new RegExp('(?:^|\\s)'+conn+'(?:$|\\s)').test(window.SpellWritingRules.normalize(ex.answer)));return `<span class="connector-pill">${safe(conn)} · ${list.length}</span>`;}).join(' ');
+  const rec=window.SpellAdaptiveTutor.overview(),box=$('#learningSuggestions');
+  box.innerHTML=!window.SpellLearningProgress.enabled()?'<p>Las recomendaciones personalizadas están desactivadas desde Configuración. Las prácticas siguen disponibles.</p>':rec.length?rec.map(item=>`<div class="learning-recommendation"><strong>${safe(item.skill)}</strong><p>${safe(item.recommendation)}</p><small>Fundamento: ${item.count} errores de esta categoría en ${item.unique} ejercicios diferentes del registro reciente.</small><button type="button" class="tutor-practice-link" data-recommended-exercise="${safe(item.exercise||'')}">✎ Practicar esta habilidad →</button></div>`).join(''):'<p>✧ Completa distintas prácticas para que aparezcan recomendaciones basadas en resultados reales. Un error aislado no constituye una dificultad recurrente.</p>';
+ }
+ function renderPractice(){
+  if(!$('#view-practica'))return;
+  $$('[data-practice-room]').forEach(b=>b.classList.toggle('active',Number(b.dataset.practiceRoom)===practiceRoom));
+  const list=window.SpellPractice.forRoom(practiceRoom);if(!list.some(e=>e.id===selectedPracticeId))selectedPracticeId=list[0]?.id;
+  const select=$('#practiceExercise');select.innerHTML=list.map(ex=>`<option value="${safe(ex.id)}" ${ex.id===selectedPracticeId?'selected':''}>${safe(ex.title)} · ${safe(ex.skill)}</option>`).join('');
+  const ex=window.SpellWritingRules.get(selectedPracticeId);if(!ex)return;
+  $('#practiceRoomLabel').textContent=D.rooms[practiceRoom].stage;
+  $('#practiceExerciseTitle').textContent=ex.title;
+  $('#practiceScene').textContent=ex.scene;
+  $('#practiceTask').textContent=ex.task;
+  $('#practiceRule').textContent=state.difficulty==='facil'?`${ex.rule} ${ex.tip}`:state.difficulty==='normal'?`Pista conceptual: ${ex.tip}`:'Consulta el texto y analiza los conectores y signos esperados. La regla se explicará tras validar.';
+  $('#practiceResult').className='practice-result';$('#practiceResult').textContent='Escribe tu expresión; no perderás vidas si te equivocas.';
+  $('#practiceInspect').hidden=true;$('#practiceAdaptiveAdvice').hidden=true;
+  educationResult=null;
+ }
+ function practiceNavigate(room){practiceRoom=Math.max(0,Math.min(2,room));selectedPracticeId=null;$('#practiceInput').value='';navigate('practica');}
+ function checkPractice(){
+  const ex=window.SpellWritingRules.get(selectedPracticeId),text=$('#practiceInput').value;
+  if(!text.trim()){$('#practiceResult').textContent='Escribe una oración antes de comprobarla. No se registra ningún error.';return;}
+  const result=window.SpellPractice.evaluate(ex.id,text);educationResult=result;
+  const box=$('#practiceResult');box.className='practice-result '+(result.dfa.accepted?'success':'error');
+  box.textContent=result.analysis.message+' '+(result.dfa.accepted?'Estado final aceptado.':'No se alcanzó un estado final.');
+  $('#practiceInspect').hidden=false;
+  const suggestion=window.SpellAdaptiveTutor.recommendation();const tutor=$('#practiceAdaptiveAdvice');
+  if(suggestion){tutor.hidden=false;tutor.textContent='✧ Tutor: '+suggestion.recommendation;}else tutor.hidden=true;
+  renderLearningStats();
+ }
+
  function showSettings(){
-  openModal('⚙ Configuración del aprendiz',`<div class="settings-fields"><label class="settings-row">Dificultad <select id="difficultyInSettings"><option value="facil" ${state.difficulty==='facil'?'selected':''}>Fácil · Aprendiz</option><option value="normal" ${state.difficulty==='normal'?'selected':''}>Intermedio · Aventurero</option><option value="dificil" ${state.difficulty==='dificil'?'selected':''}>Difícil · Archimago</option></select></label><p class="modal-note">Cambiar la dificultad después de comenzar reinicia la partida porque modifica el número de enigmas.</p><div class="settings-row"><span>♫ Música ambiental</span><button type="button" id="settingsAudioButton" class="arcane-button secondary small">${M.isEnabled()?'Desactivar':'Activar'}</button></div><label class="settings-row">Volumen <input type="range" id="volumeRange" min="0" max="100" value="${Math.round(M.getVolume()*100)}" aria-label="Volumen de la música"/><span id="volumeValue">${Math.round(M.getVolume()*100)}%</span></label><label class="settings-row">Animaciones reducidas <input type="checkbox" id="reduceMotionOption" ${reducedMotion?'checked':''}/></label><button type="button" class="arcane-button secondary" id="replayTutorial">✧ Repetir tutorial</button><button type="button" class="arcane-button secondary" id="resetGameButton">↻ Reiniciar partida</button></div>`);
+  openModal('⚙ Configuración del aprendiz',`<div class="settings-fields"><label class="settings-row">Dificultad <select id="difficultyInSettings"><option value="facil" ${state.difficulty==='facil'?'selected':''}>Fácil · Aprendiz</option><option value="normal" ${state.difficulty==='normal'?'selected':''}>Intermedio · Aventurero</option><option value="dificil" ${state.difficulty==='dificil'?'selected':''}>Difícil · Archimago</option></select></label><p class="modal-note">Cambiar la dificultad después de comenzar reinicia la partida porque modifica el número de enigmas.</p><div class="settings-row"><span>♫ Música ambiental</span><button type="button" id="settingsAudioButton" class="arcane-button secondary small">${M.isEnabled()?'Desactivar':'Activar'}</button></div><label class="settings-row">Volumen <input type="range" id="volumeRange" min="0" max="100" value="${Math.round(M.getVolume()*100)}" aria-label="Volumen de la música"/><span id="volumeValue">${Math.round(M.getVolume()*100)}%</span></label><label class="settings-row">Animaciones reducidas <input type="checkbox" id="reduceMotionOption" ${reducedMotion?'checked':''}/></label><label class="settings-row">Recomendaciones personalizadas <input type="checkbox" id="learningRecommendations" ${window.SpellLearningProgress.enabled()?'checked':''}/></label><button type="button" class="arcane-button secondary" id="clearLearningButton">✎ Borrar solo el historial de aprendizaje</button><button type="button" class="arcane-button secondary" id="replayTutorial">✧ Repetir tutorial</button><button type="button" class="arcane-button secondary" id="resetGameButton">↻ Reiniciar partida</button></div>`);
  }
  /* Navegación */
  $$('.nav-link').forEach(el=>el.addEventListener('click',()=>el.dataset.go==='aventura'&&!state.started?beginAdventure():navigate(el.dataset.go)));
@@ -321,7 +372,8 @@
  $('#startButton').addEventListener('click',beginAdventure);
  $('#tutorialReplayHome').addEventListener('click',()=>{tutorialStep=0;visitedGrimoire=false;showTutorial();});
  $('#tutorialSkip').addEventListener('click',finishTutorial);
- $('#tutorialNext').addEventListener('click',()=>{if(tutorialStep===4){finishTutorial();return;}if(tutorialStep===1&&!visitedGrimoire)return;showTutorial(tutorialStep+1);});
+ $('#tutorialNext').addEventListener('click',()=>{if(tutorialStep===tutorialPages.length-1){finishTutorial();return;}if(tutorialStep===1&&!visitedGrimoire)return;showTutorial(tutorialStep+1);});
+ $('#tutorialContent').addEventListener('click',event=>{if(event.target.id!=='tutorialMiniCheck')return;const val=$('#tutorialMiniInput').value;const ok=window.SpellWritingRules.normalize(val)===window.SpellWritingRules.normalize('Si hay hielo, caminaremos despacio.');$('#tutorialMiniMessage').textContent=ok?'✓ ¡Bien! El separador está en su lugar. Puedes continuar.':'Todavía falta algo: separa la condición inicial «Si hay hielo» con una coma y cierra con un punto.';tutorialPracticeDone=ok;});
  $('#tutorialVisit').addEventListener('click',()=>{returnFromTutorial=true;tutorialOpen=false;$('#tutorialBackdrop').hidden=true;navigate('grimorio');toast('Lee los elementos y la fórmula, luego pulsa «Volver»');});
  $('#returnFromGrimoire').addEventListener('click',()=>{if(returnFromTutorial){returnFromTutorial=false;visitedGrimoire=true;showTutorial(2);}else navigate(previousRoute==='inicio'?'inicio':'aventura');});
  $$('.difficulty-option').forEach(el=>el.addEventListener('click',()=>askDifficulty(el.dataset.difficulty)));
@@ -337,15 +389,15 @@
   archiveResult=G.replayEntry(G.roomArchive(reviewRoomIndex)[reviewChallengeIndex]);renderRoom();
  });
  $('#archiveReturnButton').addEventListener('click',closeArchive);
- $('#archiveTraceButton').addEventListener('click',()=>{if(archiveResult)navigate('validacion');});
+ $('#archiveTraceButton').addEventListener('click',()=>{if(archiveResult){educationResult=null;navigate('validacion');}});
  $('#nextRoomButton').addEventListener('click',nextRoom);
  $('#castButton').addEventListener('click',cast);
  $('#spellInput').addEventListener('input',()=>$('#spellCount').textContent=`${[...$('#spellInput').value].length}/180`);
  $('#spellInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){event.preventDefault();cast();}});
  $('#openGrimoire').addEventListener('click',()=>navigate('grimorio'));
  $('#hintButton').addEventListener('click',()=>{const r=G.currentPuzzle();openModal(`✧ Pista: ${r.title}`,`<p>${safe(r.hints[state.difficulty])}</p><p class="modal-note">Consultar pistas no gasta puntos de vida. Modo ${modeInfo().label}: ${safe(hints[state.difficulty])}</p>`);});
- $('#validationButton').addEventListener('click',()=>navigate('validacion'));
- $('#continueFromValidation').addEventListener('click',()=>navigate(isReviewing()?'aventura':state.solved[state.currentRoom]?'progreso':'aventura'));
+ $('#validationButton').addEventListener('click',()=>{educationResult=null;navigate('validacion');});
+ $('#continueFromValidation').addEventListener('click',()=>navigate(educationResult?'practica':isReviewing()?'aventura':state.solved[state.currentRoom]?'progreso':'aventura'));
  $('#audioButton').addEventListener('click',()=>{const on=M.toggle();updateAudio();toast(on?`♫ Ambiente suave activado · ${D.rooms[state.currentRoom].music}`:'Música y sonidos desactivados');});
  $('#settingsButton').addEventListener('click',showSettings);
  $('#modalClose').addEventListener('click',closeModal);$('#modalOk').addEventListener('click',closeModal);
@@ -359,14 +411,27 @@
   if(t.id==='showVictoryMap'){closeModal();navigate('progreso');}
   if(t.id==='settingsAudioButton'){M.toggle();updateAudio();t.textContent=M.isEnabled()?'Desactivar':'Activar';toast(M.isEnabled()?'Música suave activada':'Audio desactivado');}
   if(t.id==='replayTutorial'){closeModal();tutorialStep=0;visitedGrimoire=false;showTutorial();}
+  if(t.id==='clearLearningButton'){openModal('¿Borrar tus estadísticas de escritura?',`<p>Se eliminarán únicamente los registros de prácticas educativas de la V4. Tus habitaciones, vidas, archivos AFD y partida V3 permanecerán intactos.</p><button type="button" class="arcane-button primary" id="confirmClearLearning">Confirmar borrado de prácticas</button>`);}
+  if(t.id==='confirmClearLearning'){window.SpellLearningProgress.clear();closeModal();renderLearningStats();toast('Historial educativo borrado; la campaña se conserva.');}
  });
  $('#modalBody').addEventListener('change',event=>{
   const el=event.target;
   if(el.id==='difficultyInSettings'){const choice=el.value;closeModal();askDifficulty(choice);}
   if(el.id==='reduceMotionOption')setReducedMotion(el.checked);
+  if(el.id==='learningRecommendations')window.SpellLearningProgress.toggleRecommendations(el.checked);
   if(el.id==='volumeRange'){M.setVolume(Number(el.value)/100);$('#volumeValue').textContent=el.value+'%';}
  });
  $('#modalBody').addEventListener('input',event=>{if(event.target.id==='volumeRange'){M.setVolume(Number(event.target.value)/100);$('#volumeValue').textContent=event.target.value+'%';}});
+ $('#practiceFromRoom').addEventListener('click',()=>practiceNavigate(state.currentRoom));
+ $('#practiceFromGrimoire').addEventListener('click',()=>practiceNavigate(state.currentRoom));
+ $('#learningSuggestions').addEventListener('click',e=>{const button=e.target.closest('[data-recommended-exercise]');if(!button)return;const ex=window.SpellWritingRules.get(button.dataset.recommendedExercise);if(!ex)return;practiceRoom=ex.room;selectedPracticeId=ex.id;$('#practiceInput').value='';navigate('practica');});
+ $$('[data-practice-room]').forEach(b=>b.addEventListener('click',()=>practiceNavigate(Number(b.dataset.practiceRoom))));
+ $('#practiceExercise').addEventListener('change',e=>{selectedPracticeId=e.target.value;$('#practiceInput').value='';renderPractice();});
+ $('#practiceHint').addEventListener('click',()=>{const tip=window.SpellPractice.hint(selectedPracticeId);openModal('✎ Una pista de escritura',`<p>${safe(state.difficulty==='dificil'?'Revisa la estructura del enunciado antes de consultar una pista explícita.':tip)}</p><p class="modal-note">Las pistas no descuentan vidas.</p>`);renderLearningStats();});
+ $('#practiceCheck').addEventListener('click',checkPractice);
+ $('#practiceInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();checkPractice();}});
+ $('#practiceInspect').addEventListener('click',()=>{if(educationResult)navigate('validacion');});
+ window.SpellAFDView.bind();renderLearningStats();
  updateDifficultyUI();renderRoom();renderProgress();makeParticles();updateAudio();
- window.SpellUI={navigate,renderRoom,renderProgress,renderValidation,showTutorial,setReducedMotion,cast};
+ window.SpellUI={navigate,renderRoom,renderProgress,renderValidation,showTutorial,setReducedMotion,cast,renderPractice,renderLearningStats};
 })();

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#100e28" />
-  <meta name="description" content="SpellScript: minijuego educativo de lenguajes regulares y autómatas finitos deterministas." />
+  <meta name="description" content="SpellScript: aventura mágica de lenguajes regulares y escritura en español." />
   <title>SpellScript · El torreón arcano</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
@@ -44,7 +44,7 @@
             <h1 id="homeTitle" class="game-title">Spell<span>Script</span></h1>
             <div class="title-line" aria-hidden="true"><span>◆</span></div>
             <p class="home-subtitle">Un minijuego de acertijos mágicos</p>
-            <p class="home-description">Domina las <strong>lenguas regulares</strong> y los <strong>autómatas finitos deterministas</strong> para romper los sellos del torreón arcano.</p>
+            <p class="home-description">Las palabras tienen poder cuando aprendemos a utilizarlas correctamente. Domina los <strong>autómatas finitos deterministas</strong> y aprende a construir expresiones para romper los sellos del torreón.</p>
             <div class="difficulty-home" aria-label="Elige dificultad">
               <p class="small-heading">✧ ELIGE TU DIFICULTAD ✧</p>
               <div class="difficulty-switch" id="homeDifficulty"><button type="button" class="difficulty-option" data-difficulty="facil">✧ Fácil</button><button type="button" class="difficulty-option active" data-difficulty="normal">⚔ Intermedio</button><button type="button" class="difficulty-option" data-difficulty="dificil">♛ Difícil</button></div>
@@ -53,7 +53,7 @@
             <div class="home-buttons">
               <button type="button" class="arcane-button primary giant" id="startButton"><span class="play-triangle">▶</span> Comenzar aventura</button>
               <button type="button" class="arcane-button secondary" data-go="grimorio"><span>▣</span> Consultar grimorio</button>
-              <button type="button" class="arcane-button secondary" data-go="progreso"><span>✦</span> Progreso de la aventura</button><button type="button" class="tiny-tutorial-link" id="tutorialReplayHome">✧ ¿Primera vez? Ver tutorial</button>
+              <button type="button" class="arcane-button secondary" data-go="progreso"><span>✦</span> Progreso de la aventura</button><button type="button" class="tiny-tutorial-link" data-go="practica">✎ Practicar escritura sin perder vidas</button><button type="button" class="tiny-tutorial-link" id="tutorialReplayHome">✧ ¿Primera vez? Ver tutorial</button>
             </div>
 <p class="home-meta">45 acertijos posibles · 27 conjuros · 3 dificultades</p>
           </div>
@@ -121,6 +121,7 @@
               <p id="puzzleStory">Una antigua puerta permanece sellada por hielo eterno.</p>
               <p class="engraving" id="puzzlePoem">«Solo el elemento opuesto al frío...»</p>
             </div>
+            <details class="writing-instructions" id="writingInstructions"><summary>✎ Cómo construir tu expresión <span>▾</span></summary><div class="writing-instructions-body"><p><strong>Orden:</strong> invocación + «despierta en el» + círculo + «círculo y» + acción.</p><p><strong>Ejemplo de forma:</strong> «¡[invocación], despierta en el [círculo] círculo y [acción]!».</p><p>El conector <strong>y</strong> y la expresión fija son obligatorios. En la aventura clásica puedes omitir tildes, mayúsculas y puntuación; en las <strong>prácticas de escritura</strong> algunas comas sí son obligatorias.</p><p>El grimorio contiene las palabras disponibles. Las pistas ayudan sin quitar vidas, pero no necesitas leer la solución.</p><p class="writing-bad-example">Incorrecto: «Aethra Ignis segundo rompe sello» (faltan palabras y conectores).</p></div></details>
             <label class="spell-label" for="spellInput" id="spellLabel">ESCRIBE TU CONJURO</label>
             <textarea id="spellInput" spellcheck="false" maxlength="180" placeholder="¡Aethra Ignis, despierta en el..." rows="3" autocomplete="off"></textarea>
             <div class="spell-counter"><span id="inputHelp">Puedes omitir tildes, mayúsculas y signos</span><span id="spellCount">0/180</span></div>
@@ -128,13 +129,14 @@
               <button type="button" class="arcane-button secondary small" id="openGrimoire">▣ Grimorio</button>
               <button type="button" class="arcane-button secondary small" id="hintButton">✧ Pista</button>
             </div>
+            <button type="button" class="practice-room-link" id="practiceFromRoom">✎ Practicar escritura de esta sala (sin gastar vidas)</button>
             <button type="button" class="arcane-button primary cast-button" id="castButton"><span>✦</span> Lanzar conjuro</button>
             <div class="status-box" id="spellStatus" role="status" aria-live="polite">Escribe un conjuro completo y pulsa <strong>Lanzar</strong> para activar el AFD.</div>
             <button class="inline-action" type="button" id="validationButton" disabled>Ver el recorrido del autómata →</button><button type="button" class="arcane-button primary next-room-button" id="nextRoomButton" hidden>Continuar a la siguiente sala →</button>
           </aside>
           <div class="room-success" id="roomSuccess" aria-live="polite" hidden><span>✧</span> ¡HABITACIÓN SUPERADA! <span>✧</span></div>
         </div>
-        <p class="screen-footnote">La escritura es flexible: tildes, mayúsculas y signos no afectan al AFD. Elegir la combinación correcta sí importa.</p>
+        <p class="screen-footnote">En los conjuros clásicos se toleran tildes y signos opcionales; en las prácticas de escritura, las comas y los conectores indicados sí son obligatorios.</p>
       </section>
 
       <!-- GRIMORIO: referencia de elementos, sin penalización -->
@@ -165,6 +167,7 @@
               <div class="book-formula"><span>FÓRMULA CANÓNICA</span><p>¡<b>INVOCACIÓN</b>, despierta en el <b>CÍRCULO</b> círculo y <b>ACCIÓN</b>!</p></div>
             </section>
           </div>
+          <section class="learning-grimoire fantasy-panel" id="learningGrimoire" aria-labelledby="learningHeading"><div class="learning-head"><div><span class="chapter-label">✎ APRENDIZAJE DE ESCRITURA</span><h3 id="learningHeading">Mi progreso como escritor</h3><p>Datos de tus prácticas; separados de las vidas y de la aventura.</p></div><button type="button" class="arcane-button primary small" id="practiceFromGrimoire">Practicar →</button></div><div id="learningStats" class="learning-stats" aria-live="polite"></div><div id="learningSuggestions" class="learning-suggestions"></div><div class="learning-connectors" id="learningConnectors"></div><p class="privacy-label">Solo se guardan identificadores de ejercicios, resultados y categorías. No se almacenan los textos escritos.</p></section>
           <div class="grimoire-footer"><span>27 conjuros del lenguaje; distintas combinaciones resuelven cada acertijo. Se ignoran tildes, mayúsculas y signos.</span><button type="button" class="arcane-button primary" id="returnFromGrimoire">↩ Volver a la aventura</button></div>
         </div>
       </section>
@@ -192,10 +195,13 @@
               <p class="dfa-explainer">Cada carácter provoca exactamente una transición. El estado de aceptación solo verifica la <strong>sintaxis</strong>; resolver el acertijo es una regla independiente.</p>
             </div>
           </div>
+          <section class="afd-learning-box fantasy-panel" aria-label="Explorador didáctico del AFD"><div class="afd-learning-header"><div><span class="chapter-label">✧ LABORATORIO DEL AUTÓMATA</span><h3>De dónde viene, qué lee y adónde va</h3></div><div class="afd-control-badge" id="afdStepNumber">0 / 0 caracteres</div></div><div class="afd-phrase" id="afdCharacters" aria-live="off">Aquí se mostrará la cadena reconocida.</div><div class="afd-diagram" role="img" aria-label="Transición activa de autómata"><div class="afd-state-holder"><div class="afd-state" id="afdFrom">q0</div><small>Origen</small></div><div class="afd-transition-bridge"><div class="afd-symbol" id="afdSymbol">Inicio</div><svg viewBox="0 0 250 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 15 H238 M226 5 L241 15 L226 25" stroke="currentColor" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg><small id="afdFormula">Estado inicial: q0</small></div><div class="afd-state-holder"><div class="afd-state" id="afdTo">q0</div><small>Destino</small></div></div><div class="afd-controls"><button type="button" class="arcane-button secondary small" id="afdRestart">↺ Inicio</button><button type="button" class="arcane-button secondary small" id="afdPrev">← Anterior</button><button type="button" class="arcane-button primary small" id="afdPlay">▶ Reproducir</button><button type="button" class="arcane-button secondary small" id="afdNext">Siguiente →</button><label for="afdSpeed">Velocidad <select id="afdSpeed"><option value="600">Lenta</option><option value="300" selected>Media</option><option value="120">Rápida</option></select></label></div><input type="range" min="0" max="1" value="0" step="1" id="afdStepTrack" aria-label="Moverse a una transición del autómata"><div class="afd-segment-row"><span>Segmento: <strong id="afdCurrentSegment">Preparación</strong></span><button type="button" id="afdModeButton" class="text-link">Ver caracteres</button></div><div class="afd-explain"><strong id="afdExplanationTitle">Primero, el estado inicial</strong><p id="afdExplanation">El tutor explicará qué símbolo se lee en cada transición.</p></div><div class="afd-tutor" id="afdTutorBox"><span>✧ TUTOR DEL AFD</span><h4 id="afdTutorHeading">Analiza y comprende</h4><p id="afdTutorMessage">Cada paso tendrá una explicación.</p><p id="afdTutorRule"></p><div id="afdTutorCorrection" hidden><strong>Corrección propuesta para esta práctica:</strong><p id="afdTutorCorrectionText"></p></div><button type="button" class="arcane-button secondary small" id="afdCompare" hidden>◇ Comparar con el modelo</button><div id="afdComparison" hidden></div></div></section>
           <div class="validation-bottom"><button type="button" class="arcane-button secondary" data-go="aventura">← Volver a la sala</button><button type="button" class="arcane-button primary" id="continueFromValidation">Continuar aventura →</button></div>
         </div>
       </section>
 
+      <!-- PRÁCTICAS EDUCATIVAS: sin PV, con AFD propio y tutor contextual -->
+      <section class="view" id="view-practica" aria-labelledby="practiceTitle"><div class="section-topline"><span>TALLER DE ESCRITURA ARCANA</span><span>Sin penalizaciones · AFD educativo</span></div><div class="practice-screen fantasy-frame"><header class="practice-heading"><span class="heading-rune">✎</span><div><span class="chapter-label">GRAMÁTICA Y LENGUAJES FORMALES</span><h2 id="practiceTitle">Taller de expresiones mágicas</h2><p>Practica orden, conectores y puntuación. Las respuestas se validan con un autómata finito determinista de este ejercicio.</p></div></header><div class="practice-room-tabs" id="practiceRoomTabs" role="group" aria-label="Seleccionar habitación"><button type="button" class="active" data-practice-room="0">❄ Hielo · Estructura</button><button type="button" data-practice-room="1">♨ Fuego · Conectores</button><button type="button" data-practice-room="2">≋ Niebla · Puntuación</button></div><div class="practice-layout"><div class="practice-story-card fantasy-panel"><span class="chapter-label" id="practiceRoomLabel">CRISTAL DE GLACIES</span><h3 id="practiceExerciseTitle">Preparar el hechizo</h3><p class="practice-story-text" id="practiceScene"></p><label for="practiceExercise" class="spell-label">Ejercicio de escritura</label><select id="practiceExercise" class="practice-select" aria-label="Elige ejercicio"></select><div class="parchment-card practice-task"><strong>✧ Tu misión</strong><p id="practiceTask"></p></div><details id="practiceLesson"><summary>▣ Consultar regla y ejemplo</summary><p id="practiceRule"></p></details></div><div class="practice-answer-card fantasy-panel"><label for="practiceInput" class="spell-label">ESCRIBE TU EXPRESIÓN</label><textarea id="practiceInput" rows="4" maxlength="260" placeholder="Escribe la expresión completa aquí..."></textarea><p class="practice-no-lives">♧ Sin daño · Sin cambios en el progreso de las habitaciones</p><div class="practice-buttons"><button type="button" class="arcane-button secondary small" id="practiceHint">✧ Pista</button><button type="button" class="arcane-button primary" id="practiceCheck">✓ Comprobar escritura</button></div><div class="practice-result" id="practiceResult" aria-live="polite">Selecciona un ejercicio y escribe la expresión solicitada.</div><button type="button" class="arcane-button secondary" id="practiceInspect" hidden>◇ Ver transiciones y tutor del AFD →</button><div class="practice-tutor-advice" id="practiceAdaptiveAdvice" hidden></div></div></div><div class="practice-footer"><button type="button" class="arcane-button secondary small" data-go="aventura">← Volver a la aventura</button><button type="button" class="arcane-button secondary small" data-go="grimorio">▣ Ver mi progreso como escritor</button></div></div></section>
       <!-- PROGRESO: no simular salas sin implementar -->
       <section class="view" id="view-progreso" aria-labelledby="progressTitle">
         <div class="section-topline"><span>MAPA DEL TORREÓN</span><span>El camino del aprendiz</span></div>
@@ -217,6 +223,7 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <footer class="site-footer"><span>✧ SpellScript · Avance de implementación</span><span>Teoría de la Computación · Universidad de Pamplona</span></footer>
   </div>
-  <script src="js/data.js"></script><script src="js/afd.js"></script><script src="js/game.js"></script><script src="js/music.js"></script><script src="js/app.js"></script>
+  <script src="js/data.js"></script><script src="js/afd.js"></script><script src="js/game.js"></script><script src="js/music.js"></script>
+  <script src="js/writingRules.js"></script><script src="js/educationalAFD.js"></script><script src="js/writingAnalyzer.js"></script><script src="js/learningProgress.js"></script><script src="js/adaptiveTutor.js"></script><script src="js/practice.js"></script><script src="js/afdTutor.js"></script><script src="js/afdVisualizer.js"></script><script src="js/app.js"></script>
 </body>
 </html>

@@ -57,3 +57,27 @@ node pruebas/test_v3.cjs
 ```
 
 Esta entrega es una **versión para revisión local**. **No se ha actualizado GitHub ni Vercel** con V3; la publicación se realiza únicamente después de tu aprobación.
+
+---
+
+## SpellScript V4 — Módulos didácticos (versión para revisión)
+
+Esta edición conserva todas las escenas y mecánicas de la V3, incluyendo los 27 conjuros y 45 acertijos; añade **23 ejercicios de escritura en español** (orden de palabras, expresiones completas, conectores, puntuación y AFD educativo).
+
+**Cómo ejecutar:** abre `index.html` en Chrome, Edge o Firefox; no requiere instalación, IA externa ni red. Entra en **Practicar escritura sin perder vidas** desde la portada, en **Practicar escritura de esta sala** desde la aventura o en el botón del nuevo panel **Mi progreso como escritor** dentro del grimorio. El panel de validación del AFD ahora tiene reproducción, pausa, pasos, velocidad, explicación por transición y corrección contextual.
+
+**Cómo funciona la escritura:** los **conjuros clásicos** siguen admitiendo omisión de signos, variaciones de mayúsculas y tildes. En el **Taller de escritura**, el AFD reconoce cada respuesta según un patrón explícito que conserva comas y conectores obligatorios. Un analizador identifica categorías de errores y un tutor propone refuerzos solo con evidencia repetida. No es una IA de lenguaje libre. Los ejercicios **no gastan vidas**.
+
+**Privacidad y compatibilidad:** `spellscript-v3-save` sigue conservando la campaña actual. El historial educativo vive en `spellscript-v4-learning`, guarda categorías y resultados, **no las frases del usuario**, y se puede borrar por separado en Ajustes. También se pueden desactivar las recomendaciones. Si el navegador no permite almacenamiento, el juego continúa sin guardar las estadísticas educativas.
+
+**Pruebas ejecutables:**
+
+```bash
+node pruebas/test_motor.cjs
+node pruebas/test_v3.cjs
+node pruebas/test_v4.cjs
+```
+
+Evidencias visuales: `capturas_v4/`. Descripción de módulos, fragmentos de código y dificultades: `DOCUMENTACION_IMPLEMENTACION_V4.md`. Resultados: `pruebas/RESULTADOS_V4.md`.
+
+**Limitaciones conocidas:** el sistema reconoce respuestas previamente definidas, no corrige español abierto ni acepta todas las paráfrasis posibles. La mejora de aprendizaje requiere evaluación posterior con estudiantes. No se ha publicado V4 en GitHub ni en Vercel: este ZIP es para revisión.
