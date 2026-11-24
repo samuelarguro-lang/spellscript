@@ -1,0 +1,18 @@
+[
+  {
+    "viewport": [
+      360,
+      800
+    ],
+    "noOverflow": true,
+    "companionMouthAnimation": true,
+    "automaticAdvice": true,
+    "audioEnabled": true,
+    "afd": true,
+    "graphicsSaved": true,
+    "uiCampaignComplete": false,
+    "idleFrameSample": null,
+    "movingFrameSample": null,
+    "errors": []
+  }
+]

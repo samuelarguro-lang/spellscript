@@ -10,6 +10,7 @@
  function jump(next){if(!result?.dfa)return;index=Math.max(0,Math.min(next,result.dfa.trace.length));draw();}
  function segmentFor(charIndex,normalized,educational){
   if(educational)return result.exercise?.skill||'escritura';
+  if(result?.dfa?.natural)return window.SpellNatural.segment(result.dfa).find(m=>m.end>=charIndex)?.label||'Expresión';
   const prefix=normalized.slice(0,charIndex),words=prefix.trim().split(/\s+/).length;
   if(words<=2)return 'Invocación';if(words<=5)return 'Fórmula fija';if(words<=8)return 'Círculo';return 'Acción';
  }
@@ -53,15 +54,15 @@
   if(chunk.length)groups.push(chunk);
   return groups.map(g=>{const last=g[g.length-1],start=g[0];return `<button type="button" class="trace-row trace-group ${last.rejected?'rejected':''}" data-jump="${last.position}"><span>${start.position}-${last.position}</span><span class="char">${safe(g.map(s=>s.symbol).join(''))||'␣'}</span><span>${safe(start.from)}</span><span>→ ${safe(last.to)}</span></button>`;}).join('');
  }
- function render(input){pause();result=input?.dfa?input:null;index=0;const t=$('#traceScroller');
+ function render(input){pause();result=input?.dfa?input:null;index=result?.dfa?.firstError?Math.min(result.dfa.trace.length,result.dfa.firstError.index):0;const t=$('#traceScroller');
   if(t){t.innerHTML=result?groupTrace(result.dfa):'<p>Aún no hay transiciones.</p>';}
   const tutor=$('#afdTutorBox');
   if(tutor){const info=window.SpellAFDTutor.review(result);
    $('#afdTutorHeading').textContent=info.title;
    $('#afdTutorMessage').textContent=info.message;
    $('#afdTutorRule').textContent=info.rule||'';
-   $('#afdTutorCorrection').hidden=!result?.educational||info.accepted;
-   if(result?.educational&&!info.accepted)$('#afdTutorCorrectionText').textContent=info.suggestion||'';
+   $('#afdTutorCorrection').hidden=!(result?.educational||result?.dfa?.natural)||info.accepted||!info.suggestion;
+   if((result?.educational||result?.dfa?.natural)&&!info.accepted)$('#afdTutorCorrectionText').textContent=info.suggestion||'';
    $('#afdTutorBox').classList.toggle('afd-tutor-ok',Boolean(info.accepted));
   }
   $('#afdModeButton').textContent=mode==='segmentos'?'Ver caracteres':'Agrupar segmentos';

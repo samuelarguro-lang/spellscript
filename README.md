@@ -81,3 +81,9 @@ node pruebas/test_v4.cjs
 Evidencias visuales: `capturas_v4/`. Descripción de módulos, fragmentos de código y dificultades: `DOCUMENTACION_IMPLEMENTACION_V4.md`. Resultados: `pruebas/RESULTADOS_V4.md`.
 
 **Limitaciones conocidas:** el sistema reconoce respuestas previamente definidas, no corrige español abierto ni acepta todas las paráfrasis posibles. La mejora de aprendizaje requiere evaluación posterior con estudiantes. No se ha publicado V4 en GitHub ni en Vercel: este ZIP es para revisión.
+
+## V5 — Aether y magia en español
+Abre `index.html`. Las fórmulas visibles en cada sala cambian con la dificultad; Aether da consejos durante los intentos. Las prácticas complementarias están en el grimorio. Consulta `DOCUMENTACION_IMPLEMENTACION_V5.md` y las capturas de `capturas_v5/`.
+
+## V6 — El despertar de la magia
+Animaciones completas por defecto, escenarios en capas, Aether expresivo, efectos Canvas y cinemáticas locales saltables. Consulta `DOCUMENTACION_IMPLEMENTACION_V6.md` y `pruebas/RESULTADOS_*V6*` para los cambios y límites de las comprobaciones. Abre `index.html`, activa ♫ para el audio y usa Ajustes para modificar el movimiento.

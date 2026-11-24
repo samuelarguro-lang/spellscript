@@ -1,0 +1,17 @@
+{
+  "scene": "fuego",
+  "defaultFullEvenSystemReduced": true,
+  "stationaryAnimationMs": 1316.4999999999995,
+  "pointerAnimationMs": 8033.000000000002,
+  "afterPointerMs": 6416.399999999998,
+  "clockElapsed": 21.705800000000007,
+  "captureFrames": 334,
+  "headlessSample": {
+    "fps": 32.43360121085445,
+    "averageMs": 30.832222222222217,
+    "p95Ms": 50,
+    "samples": 180
+  },
+  "horizontalOverflow": false,
+  "jsErrors": []
+}

@@ -1,0 +1,76 @@
+[
+  {
+    "viewport": [
+      1440,
+      900
+    ],
+    "noOverflow": true,
+    "companionMouthAnimation": true,
+    "automaticAdvice": true,
+    "audioEnabled": true,
+    "afd": true,
+    "graphicsSaved": true,
+    "uiCampaignComplete": true,
+    "idleFrameSample": {
+      "fps": 51.92557334487235,
+      "averageMs": 19.258333333333333,
+      "p95Ms": 33.400000000000546,
+      "samples": 180
+    },
+    "movingFrameSample": {
+      "fps": 58.380902957965745,
+      "averageMs": 17.12888888888889,
+      "p95Ms": 16.799999999999272,
+      "samples": 180
+    },
+    "errors": []
+  },
+  {
+    "viewport": [
+      768,
+      1024
+    ],
+    "noOverflow": true,
+    "companionMouthAnimation": true,
+    "automaticAdvice": true,
+    "audioEnabled": true,
+    "afd": true,
+    "graphicsSaved": true,
+    "uiCampaignComplete": false,
+    "idleFrameSample": null,
+    "movingFrameSample": null,
+    "errors": []
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "noOverflow": true,
+    "companionMouthAnimation": true,
+    "automaticAdvice": true,
+    "audioEnabled": true,
+    "afd": true,
+    "graphicsSaved": true,
+    "uiCampaignComplete": false,
+    "idleFrameSample": null,
+    "movingFrameSample": null,
+    "errors": []
+  },
+  {
+    "viewport": [
+      360,
+      800
+    ],
+    "noOverflow": true,
+    "companionMouthAnimation": true,
+    "automaticAdvice": true,
+    "audioEnabled": true,
+    "afd": true,
+    "graphicsSaved": true,
+    "uiCampaignComplete": false,
+    "idleFrameSample": null,
+    "movingFrameSample": null,
+    "errors": []
+  }
+]

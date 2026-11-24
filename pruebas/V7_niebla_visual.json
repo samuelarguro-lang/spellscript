@@ -1,0 +1,17 @@
+{
+  "scene": "niebla",
+  "defaultFullEvenSystemReduced": true,
+  "stationaryAnimationMs": 1366.6000000000001,
+  "pointerAnimationMs": 8066.4000000000015,
+  "afterPointerMs": 6433.1,
+  "clockElapsed": 21.762599999999953,
+  "captureFrames": 395,
+  "headlessSample": {
+    "fps": 36.61141055629004,
+    "averageMs": 27.31388888888889,
+    "p95Ms": 50,
+    "samples": 180
+  },
+  "horizontalOverflow": false,
+  "jsErrors": []
+}

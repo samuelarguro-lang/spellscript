@@ -1,0 +1,1 @@
+PASS: default full, 3 modes, validation, persistence and storage failure fallback

@@ -112,7 +112,7 @@
  }
  function replayEntry(entry){
   if(!entry||typeof entry.text!=='string')return null;
-  const dfa=window.SpellAFD.run(entry.text);
+  const dfa=entry.natural&&window.SpellNatural?window.SpellNatural.run(entry.text,entry.mode):window.SpellAFD.run(entry.text);
   return {...entry,dfa,archive:true,roomIndex:entry.roomIndex,challengeIndex:entry.challengeIndex};
  }
  function cast(raw){
@@ -122,7 +122,8 @@
   if(state.solved[roomIndex])return {kind:'already-solved',damage:0,message:'Ya superaste esta habitación. Consulta el archivo del AFD o continúa tu aventura.'};
   const challengeIndex=state.progress[roomIndex];
   const puzzle=currentPuzzle();
-  const dfa=window.SpellAFD.run(text);
+  const legacy=window.SpellAFD.run(text);
+  const dfa=window.SpellNatural&&!legacy.accepted?window.SpellNatural.run(text,state.difficulty):legacy;
   state.attempts++;
   const result={dfa,text,roomIndex,challengeIndex,puzzleId:puzzle.id,damage:0};
   if(!dfa.accepted){
@@ -145,7 +146,7 @@
     result.message='La frase es válida para el AFD, pero no resuelve este acertijo (−2 PV). Relee los símbolos del altar.';
    }
   }
-  const entry={roomIndex,challengeIndex,puzzleId:puzzle.id,text:text.slice(0,180),kind:result.kind,damage:result.damage,time:Date.now()};
+  const entry={roomIndex,challengeIndex,puzzleId:puzzle.id,text:text.slice(0,180),kind:result.kind,damage:result.damage,time:Date.now(),natural:Boolean(dfa.natural),mode:state.difficulty};
   state.history[roomIndex].push(entry);
   if(state.history[roomIndex].length>100)state.history[roomIndex].splice(0,state.history[roomIndex].length-100);
   if(state.lives===0){

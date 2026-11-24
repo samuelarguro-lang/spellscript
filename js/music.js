@@ -91,5 +91,8 @@
   if(document.hidden)context.suspend().catch(()=>{});
   else if(enabled)context.resume().catch(()=>{});
  });
- window.SpellMusic={toggle,enable,disable,setTheme,setVolume,spell,reward,isEnabled:()=>enabled,getVolume:()=>volume};
+ function castSequence(element,accepted,correct){if(!enabled||!context)return;const root=element==='fire'?196:element==='ice'?293.66:246.94;const t=context.currentTime+.01;if(!accepted){note(150,t,.32,.065,'triangle',720);return;}[1,1.25,1.5].forEach((r,i)=>note(root*r,t+i*.18,.55,.045,'sine',2100,i%2?.2:-.2));note(root*2,t+.74,.43,.06,'triangle',2400,-.25);note(root*.5,t+1.18,.55,.10,'triangle',500,.1);if(correct){note(root*2,t+1.2,.65,.07,'sine',2800,.3);note(root*3,t+1.36,.5,.045,'sine',3100,-.3);}else note(130,t+1.18,.35,.06,'triangle',500);}
+ function effectPhase(phase,element,correct){if(!enabled||!context)return;const t=context.currentTime+.005,root=element==='fire'?196:element==='ice'?293.66:246.94;if(phase==='charge'){[1,1.25,1.5,2].forEach((r,i)=>note(root*r,t+i*.15,.45,.043,'sine',2100));}else if(phase==='launch'){note(root*2,t,.23,.075,'triangle',2600,-.2);note(root,t+.06,.22,.045,'sine',1400);}else{note(root*.5,t,.47,.09,'triangle',580);if(correct)[2,2.5,3].forEach((r,i)=>note(root*r,t+.08*i,.5,.044,'sine',2600));}}
+ function companion(happy){if(!enabled||!context)return;const t=context.currentTime+.01;[1,1.18,happy?1.5:1.12].forEach((r,i)=>note(520*r,t+i*.095,.10,.014,'sine',2600));}
+ window.SpellMusic={effectPhase,companion,castSequence,toggle,enable,disable,setTheme,setVolume,spell,reward,isEnabled:()=>enabled,getVolume:()=>volume};
 })();

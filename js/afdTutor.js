@@ -2,6 +2,7 @@
 (function(){
  'use strict';
  function getStateEdges(dfa,source){
+  if(dfa.natural)return window.SpellNatural.automata[dfa.mode].states;
   if(source==='educational'){
    const states=window.SpellEducationalAFD.getStates(dfa.exerciseId);
    return states;
@@ -26,7 +27,8 @@
   }
   const final=step.position===dfa.trace.length&&dfa.accepted;
   let segment='estructura de la expresión';
-  if(!result.educational){const wordCount=dfa.normalized.slice(0,step.position).split(/\s+/).length;
+  if(dfa.natural){segment=window.SpellNatural.segment(dfa).find(m=>m.end>=step.position)?.label||'expresión';}
+  else if(!result.educational){const wordCount=dfa.normalized.slice(0,step.position).split(/\s+/).length;
    segment=wordCount<=2?'invocación':wordCount<=5?'fórmula fija':wordCount<=8?'círculo': 'acción del conjuro';
   }else segment=result.exercise?.skill||'ejercicio';
   return {heading:final?'Estado de aceptación':`Transición ${step.position}: ${step.from} → ${step.to}`,
@@ -37,6 +39,7 @@
   if(result.educational){const analysis=result.analysis||window.SpellWritingAnalyzer.analyze(result.exercise.id,result.text,result.dfa);
    return {title:analysis.accepted?'Expresión reconocida':'Corrección guiada del AFD',message:window.SpellAdaptiveTutor.contextual(result.exercise,analysis),suggestion:analysis.correction,rule:analysis.advice,category:analysis.category,accepted:analysis.accepted};
   }
+  if(result.dfa.natural&&!result.dfa.accepted){const a=window.SpellNatural.analyze(result.dfa);return {title:'Aether · Corrige tu hechizo',message:a.message,suggestion:a.suggestion,rule:window.SpellNatural.describe(result.dfa.mode),accepted:false};}
   if(result.dfa.accepted)return {title:'Cadena aceptada por el AFD',message:result.kind==='wrong-choice'?'La expresión es formalmente válida, pero su elemento, círculo o acción no resuelve este acertijo. El AFD solo reconoce la estructura; la regla de la sala decide el acierto.':'El AFD consumió todos los caracteres y terminó en un estado final. Una expresión correcta no implica que cualquier reto se resuelva.',accepted:true};
   const fault=result.dfa.firstError;
   return {title:'¿Por qué se rechazó el conjuro?',message:fault?.kind==='incomplete'?'La expresión terminó antes de alcanzar un estado final. Revisa si falta alguna palabra, conector o acción en la fórmula del grimorio.':`El AFD llegó al estado sumidero cerca del símbolo ${fault?.index??'?'} de la forma normalizada. Reproduce el recorrido para identificar qué esperaba.`,rule:'Fórmula: INVOCACIÓN + «despierta en el» + CÍRCULO + «círculo y» + ACCIÓN.',accepted:false};

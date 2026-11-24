@@ -1,0 +1,17 @@
+{
+  "scene": "hielo",
+  "defaultFullEvenSystemReduced": true,
+  "stationaryAnimationMs": 1349.8999999999996,
+  "pointerAnimationMs": 8033.0,
+  "afterPointerMs": 6549.699999999997,
+  "clockElapsed": 21.89579999999994,
+  "captureFrames": 408,
+  "headlessSample": {
+    "fps": 38.029240260289015,
+    "averageMs": 26.29555555555556,
+    "p95Ms": 50,
+    "samples": 180
+  },
+  "horizontalOverflow": false,
+  "jsErrors": []
+}

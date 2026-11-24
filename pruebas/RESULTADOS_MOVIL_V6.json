@@ -1,0 +1,32 @@
+[
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "default_full": true,
+    "cinematic_skip": true,
+    "companion_mouth": true,
+    "audio_enabled": true,
+    "syntax_penalty": true,
+    "afd": true,
+    "horizontal_overflow": false,
+    "graphics_saved_test_storage": true,
+    "errors": []
+  },
+  {
+    "viewport": [
+      360,
+      800
+    ],
+    "default_full": true,
+    "cinematic_skip": true,
+    "companion_mouth": true,
+    "audio_enabled": true,
+    "syntax_penalty": true,
+    "afd": true,
+    "horizontal_overflow": false,
+    "graphics_saved_test_storage": true,
+    "errors": []
+  }
+]

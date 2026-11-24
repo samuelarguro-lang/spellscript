@@ -1,0 +1,65 @@
+
+--- pruebas/test_motor.cjs ---
+{
+  "result": "PASS",
+  "validSpells": 27,
+  "dfaStates": 680,
+  "invalidRejected": true,
+  "campaignModes": [
+    "facil",
+    "normal",
+    "dificil"
+  ],
+  "rooms": 3,
+  "lifeReset": true,
+  "progressPersists": true
+}
+
+--- pruebas/test_v3.cjs ---
+{
+  "status": "PASS",
+  "modeTests": 3,
+  "roomTests": 9,
+  "puzzleBankPerRoom": [
+    15,
+    15,
+    15
+  ],
+  "acceptedSpells": 27,
+  "randomRotation": true,
+  "historyReplay": true,
+  "historySurvivesRefresh": true,
+  "lifeReset": true
+}
+
+--- pruebas/test_v4.cjs ---
+{
+  "result": "PASS",
+  "classicSpells": 27,
+  "classicRiddles": 45,
+  "educationalExercises": 23,
+  "strictCommas": true,
+  "strictConnectors": true,
+  "variantsAccepted": true,
+  "classifiedErrors": true,
+  "recurrentMinDifferentExercises": 3,
+  "suggestions": true,
+  "noLifeLoss": true,
+  "learningPersistence": true,
+  "keepsV3Save": true,
+  "retainsOriginalGame": true
+}
+
+--- pruebas/test_v5.cjs ---
+{
+  "status": "PASS",
+  "naturalSpells": 243,
+  "rooms": 9,
+  "legacySpells": 27,
+  "puzzles": 45,
+  "comma": true,
+  "connector": true,
+  "adaptiveHelp": true,
+  "historyReplay": true,
+  "persistence": true
+}

@@ -1,0 +1,17 @@
+{
+  "scene": "menu",
+  "defaultFullEvenSystemReduced": true,
+  "stationaryAnimationMs": 1333.3,
+  "pointerAnimationMs": 8083.0,
+  "afterPointerMs": 6033.100000000002,
+  "clockElapsed": 21.445799999999863,
+  "captureFrames": 463,
+  "headlessSample": {
+    "fps": 46.95938013618222,
+    "averageMs": 21.29499999999999,
+    "p95Ms": 33.400000000001455,
+    "samples": 180
+  },
+  "horizontalOverflow": false,
+  "jsErrors": []
+}

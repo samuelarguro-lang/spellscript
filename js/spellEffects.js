@@ -1,0 +1,1 @@
+(function(){'use strict';function launch(element,result,done){const accepted=Boolean(result.dfa?.accepted),ok=result.kind==='correct';window.SpellMusic.effectPhase?.('charge',element);window.SpellParticles.play(element,accepted,ok,()=>window.SpellScenes.impact(ok,accepted),done);}window.SpellEffects={launch};})();
