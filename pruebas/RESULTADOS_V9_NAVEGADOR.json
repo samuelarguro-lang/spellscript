@@ -1,0 +1,198 @@
+[
+  {
+    "viewport": [
+      1440,
+      900
+    ],
+    "rooms": [
+      {
+        "room": 0,
+        "video": {
+          "w": 1112,
+          "h": 834,
+          "src": "assets/loops/high/ice.mp4",
+          "time": 1.476082,
+          "quality": {
+            "total": 41,
+            "dropped": 5
+          },
+          "fps": {
+            "fps": 47.828166442019224,
+            "averageMs": 20.908181818181816,
+            "p95Ms": 33.40000000000009,
+            "samples": 110
+          }
+        },
+        "title": "El invierno ha cedido",
+        "solved": "3/3",
+        "lives": "6/7",
+        "rewards": {
+          "runes": {
+            "0": true
+          },
+          "achievements": {
+            "combo3": true
+          },
+          "secrets": {},
+          "combo": 3,
+          "best": 3,
+          "bonus": 15,
+          "seen": {
+            "hielo-14": true,
+            "hielo-4": true,
+            "hielo-6": true
+          }
+        }
+      },
+      {
+        "room": 1,
+        "video": {
+          "w": 1112,
+          "h": 834,
+          "src": "assets/loops/high/fire.mp4",
+          "time": 0.534053,
+          "quality": {
+            "total": 17,
+            "dropped": 7
+          },
+          "fps": {
+            "fps": 48.001280034134226,
+            "averageMs": 20.832777777777785,
+            "p95Ms": 50,
+            "samples": 180
+          }
+        },
+        "title": "Las llamas se inclinan",
+        "solved": "3/3",
+        "lives": "7/7",
+        "rewards": {
+          "runes": {
+            "0": true,
+            "1": true
+          },
+          "achievements": {
+            "combo3": true,
+            "combo5": true,
+            "perfect": true
+          },
+          "secrets": {},
+          "combo": 6,
+          "best": 6,
+          "bonus": 80,
+          "seen": {
+            "hielo-14": true,
+            "hielo-4": true,
+            "hielo-6": true,
+            "fuego-4": true,
+            "fuego-13": true,
+            "fuego-1": true
+          }
+        }
+      },
+      {
+        "room": 2,
+        "video": {
+          "w": 1112,
+          "h": 834,
+          "src": "assets/loops/high/mist.mp4",
+          "time": 0.128825,
+          "quality": {
+            "total": 4,
+            "dropped": 0
+          },
+          "fps": {
+            "fps": 52.94273360981203,
+            "averageMs": 18.888333333333343,
+            "p95Ms": 16.799999999999272,
+            "samples": 180
+          }
+        },
+        "title": "El torreón despierta",
+        "solved": "3/3",
+        "lives": "7/7",
+        "rewards": {
+          "runes": {
+            "0": true,
+            "1": true,
+            "2": true
+          },
+          "achievements": {
+            "combo3": true,
+            "combo5": true,
+            "perfect": true,
+            "all": true
+          },
+          "secrets": {},
+          "combo": 9,
+          "best": 9,
+          "bonus": 155,
+          "seen": {
+            "hielo-14": true,
+            "hielo-4": true,
+            "hielo-6": true,
+            "fuego-4": true,
+            "fuego-13": true,
+            "fuego-1": true,
+            "niebla-10": true,
+            "niebla-1": true,
+            "niebla-2": true
+          }
+        }
+      }
+    ],
+    "errors": [],
+    "bad": [],
+    "mouseContinues": true
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "rooms": [
+      {
+        "room": 0,
+        "video": {
+          "w": 960,
+          "h": 720,
+          "src": "assets/loops/medium/ice.mp4",
+          "time": 2.181853,
+          "quality": {
+            "total": 56,
+            "dropped": 2
+          },
+          "fps": {
+            "fps": 56.66855561852068,
+            "averageMs": 17.646470588235275,
+            "p95Ms": 16.799999999999955,
+            "samples": 170
+          }
+        },
+        "title": "El invierno ha cedido",
+        "solved": "3/3",
+        "lives": "7/7",
+        "rewards": {
+          "runes": {
+            "0": true
+          },
+          "achievements": {
+            "combo3": true,
+            "perfect": true
+          },
+          "secrets": {},
+          "combo": 3,
+          "best": 3,
+          "bonus": 15,
+          "seen": {
+            "hielo-1": true,
+            "hielo-8": true,
+            "hielo-3": true
+          }
+        }
+      }
+    ],
+    "errors": [],
+    "bad": [],
+    "mouseContinues": true
+  }
+]

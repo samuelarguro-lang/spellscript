@@ -1,0 +1,12 @@
+{
+  "tablet": [
+    768,
+    1024
+  ],
+  "qualitySwitch": true,
+  "graphicsSwitch": true,
+  "music": true,
+  "persistence": true,
+  "wonRoomNotReplayed": true,
+  "errors": []
+}

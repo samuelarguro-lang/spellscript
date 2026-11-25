@@ -1,0 +1,16 @@
+=== castle V8 compressed ===
+960,540,24/1,476478
+=== castle Higgsfield original ===
+1280,720,24/1,2369130
+=== ice V8 compressed ===
+960,540,24/1,617070
+=== ice Higgsfield original ===
+1280,720,24/1,2534419
+=== fire V8 compressed ===
+960,540,24/1,613149
+=== fire Higgsfield original ===
+1280,720,24/1,2457794
+=== mist V8 compressed ===
+960,540,24/1,568705
+=== mist Higgsfield original ===
+1280,720,24/1,2658718

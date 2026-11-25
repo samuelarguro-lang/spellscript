@@ -1,0 +1,28 @@
+/* V9 clean scenery and independent cinematic victory. */
+.v7-home-orbit,.floating-crystal,.rune-orbit,.v7-home-particles,.v7-ambient,.v7-ice-seal,.v7-astral-ring,.room-portal,.room-success,#particles,.door-aura,.snowfall{display:none!important}
+.v6-scene .v6-architecture,.v8-bg-video{object-fit:cover;object-position:center;transform:none!important;filter:none}
+.v6-scene .v9-completed-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5}
+.v6-scene .v9-completed-art[hidden],.v9-victory-film[hidden]{display:none!important}
+.v6-scene[data-complete=true] .v7-guardian{display:none}
+.v6-scene[data-victory=playing] .v7-guardian{opacity:0;transition:opacity .25s}
+.v9-victory-film{position:absolute;inset:0;z-index:15;background:#101225;overflow:hidden;border-radius:7px}
+.v9-victory-film video{height:100%;width:100%;object-fit:cover;display:block}
+#v9Skip{position:absolute;top:12px;right:12px;border:1px solid #c4a477;background:#17172be6;color:#f5dbad;padding:10px 16px;border-radius:6px;font:13px Georgia;cursor:pointer;z-index:2}
+.v9-victory-dialog{width:min(560px,92vw);max-height:92dvh;margin:auto;padding:0;color:#eee5ef;border:1px solid #b89464;border-radius:13px;background:#111528;box-shadow:0 24px 90px #000a;overflow:auto;scrollbar-width:thin}
+.v9-victory-dialog::backdrop{background:#090c1cc9}
+.v9-hero{position:relative;height:clamp(135px,27vh,245px);overflow:hidden;background:#16162d}
+.v9-hero img{width:100%;height:100%;object-fit:cover;object-position:50% 48%}
+.v9-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#111528,transparent 45%);pointer-events:none}
+#v9Close{position:absolute;right:12px;top:12px;background:#15162cdd;color:#f5d7a2;border:1px solid #b99563;border-radius:50%;width:34px;height:34px;font-size:22px;z-index:2;cursor:pointer}
+.v9-victory-content{padding:0 28px 24px;text-align:center}
+.v9-kicker{font:11px Arial;letter-spacing:3px;color:#d7b985;margin:9px 0 12px}
+.v9-victory-content h2{font:700 clamp(24px,5vw,37px) Georgia;color:#ffe1a8;margin:0 0 10px;text-shadow:0 2px 18px #e9b76a24}
+#v9VictorySubtitle{color:#cfc3d9;font:italic 15px/1.5 Georgia;margin:0 auto 18px;max-width:390px}
+.v9-rune{display:flex;gap:14px;align-items:center;justify-content:center;margin:0 auto 18px;padding:11px;border-block:1px solid #a88c5d55;color:#f0d5a4}
+.v9-rune>span{font-size:32px;background:radial-gradient(#a181df55,transparent 70%);border:1px solid #a68abb;width:51px;height:51px;border-radius:50%;display:grid;place-items:center;color:#f8e0ab}
+.v9-rune>div{text-align:left}.v9-rune small,.v9-stat small{display:block;color:#b5aac7;font:11px Arial;margin-top:5px}
+.v9-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.v9-stat{padding:12px 4px;background:#1d2038;border:1px solid #a7885c38;border-radius:6px}
+.v9-stat strong{font:700 23px Georgia;color:#f5d49a}.v9-stat:nth-child(2) strong{color:#f3a0b9}.v9-stat:nth-child(3) strong{color:#d6b2f7}
+#v9Continue{width:100%;font-size:18px;min-height:48px}#v9Trace{display:block;margin:12px auto 0;color:#dac3f0}
+@media(max-width:720px){.v9-victory-content{padding:0 14px 17px}.v9-hero{height:145px}.v9-stat strong{font-size:20px}.v9-rune{margin-bottom:12px}.v9-stat-grid{margin-bottom:12px}#v9VictorySubtitle{font-size:13px}#v9Continue{font-size:15px}}

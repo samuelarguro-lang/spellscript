@@ -1,0 +1,94 @@
+{
+  "results": [
+    {
+      "room": 0,
+      "idle": {
+        "metrics": {
+          "fps": 46.155029616144006,
+          "averageMs": 21.66611111111111,
+          "p95Ms": 49.899999999999636,
+          "samples": 180
+        },
+        "video": 0,
+        "src": "http://127.0.0.1:32944/assets/loops/ice.mp4",
+        "decoded": {},
+        "volume": 0.63,
+        "engine": "PixiJS"
+      },
+      "moving": {
+        "metrics": {
+          "fps": 46.55373076425707,
+          "averageMs": 21.48055555555556,
+          "p95Ms": 49.899999999999636,
+          "samples": 180
+        },
+        "video": 1.92789,
+        "src": "http://127.0.0.1:32944/assets/loops/ice.mp4",
+        "decoded": {},
+        "volume": 0.63,
+        "engine": "PixiJS"
+      }
+    },
+    {
+      "room": 1,
+      "idle": {
+        "metrics": {
+          "fps": 28.57233562970253,
+          "averageMs": 34.99888888888889,
+          "p95Ms": 83.29999999999927,
+          "samples": 180
+        },
+        "video": 4.200116,
+        "src": "http://127.0.0.1:32944/assets/loops/fire.mp4",
+        "decoded": {},
+        "volume": 0.6312,
+        "engine": "PixiJS"
+      },
+      "moving": {
+        "metrics": {
+          "fps": 25.175881505517715,
+          "averageMs": 39.720555555555556,
+          "p95Ms": 83.29999999999927,
+          "samples": 180
+        },
+        "video": 0.839006,
+        "src": "http://127.0.0.1:32944/assets/loops/fire.mp4",
+        "decoded": {},
+        "volume": 0.6312,
+        "engine": "PixiJS"
+      }
+    },
+    {
+      "room": 2,
+      "idle": {
+        "metrics": {
+          "fps": 32.24015331984023,
+          "averageMs": 31.017222222222223,
+          "p95Ms": 50,
+          "samples": 180
+        },
+        "video": 3.046029,
+        "src": "http://127.0.0.1:32944/assets/loops/mist.mp4",
+        "decoded": {},
+        "volume": 0.6312,
+        "engine": "PixiJS"
+      },
+      "moving": {
+        "metrics": {
+          "fps": 42.025635637739036,
+          "averageMs": 23.79499999999999,
+          "p95Ms": 50,
+          "samples": 180
+        },
+        "video": 5.06333,
+        "src": "http://127.0.0.1:32944/assets/loops/mist.mp4",
+        "decoded": {},
+        "volume": 0.6312,
+        "engine": "PixiJS"
+      }
+    }
+  ],
+  "aether": true,
+  "graphics": true,
+  "errors": []
+}

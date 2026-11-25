@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#100e28" />
   <meta name="description" content="SpellScript: aventura mágica de lenguajes regulares y escritura en español." />
-  <title>SpellScript · El torreón arcano</title>
+  <title>SpellScript V9 · Ascensión arcana</title>
   <link rel="stylesheet" href="css/styles.css" />
-  <link rel="stylesheet" href="css/scenes.css" /><link rel="stylesheet" href="css/v7.css" />
+  <link rel="stylesheet" href="css/scenes.css" /><link rel="stylesheet" href="css/v7.css" /><link rel="stylesheet" href="css/v8.css" /><link rel="stylesheet" href="css/v9.css" />
 </head>
 <body>
   <div id="app" class="app-shell">
     <div class="ambient ambient-one" aria-hidden="true"></div>
     <div class="ambient ambient-two" aria-hidden="true"></div>
-    <div class="particles" id="particles" aria-hidden="true"></div>
 
     <header class="topbar">
       <button type="button" class="brand nav-link" data-go="inicio" aria-label="Ir al inicio">
@@ -41,7 +40,6 @@
           <div class="home-darkening" aria-hidden="true"></div>
           <div class="home-copy">
             <p class="eyebrow ornament">✦ EL TORREÓN DE LAS LENGUAS ✦</p>
-            <div class="rune-orbit" aria-hidden="true"><span>✧</span></div>
             <h1 id="homeTitle" class="game-title">Spell<span>Script</span></h1>
             <div class="title-line" aria-hidden="true"><span>◆</span></div>
             <p class="home-subtitle">Un minijuego de acertijos mágicos</p>
@@ -59,8 +57,6 @@
 <p class="home-meta">45 acertijos · hechizos en español · 3 dificultades</p>
           </div>
           <div class="hero-inscription" aria-hidden="true">ᚨ &nbsp; ᛟ &nbsp; ᚠ</div>
-          <div class="floating-crystal crystal-a" aria-hidden="true">◆</div>
-          <div class="floating-crystal crystal-b" aria-hidden="true">◆</div>
           <div class="home-bottom-line" aria-hidden="true"></div>
         </div>
         <p class="screen-footnote">Un viaje donde cada carácter importa. Tres elementos · Tres círculos · Tres acciones.</p>
@@ -104,13 +100,8 @@
             </div>
             <div class="cast-effect" id="castEffect" aria-hidden="true">✧</div>
             <div class="riddle-celebration" id="riddleCelebration" aria-hidden="true" hidden><span class="celebration-star">✦</span><strong>¡ACERTIJO SUPERADO!</strong><small>El siguiente sello te espera</small></div>
-            <div class="room-portal" id="roomPortal" aria-hidden="true" hidden>
-              <div class="portal-light"></div><div class="portal-aura-ring"></div>
-              <div class="portal-half portal-left"><span>◇</span></div>
-              <div class="portal-half portal-right"><span>◇</span></div>
-              <div class="portal-shine"></div><div class="portal-caption">✦ EL PORTAL SE ABRE ✦</div>
-            </div>
-            <div class="encounter-ui" id="encounterUI"><div class="encounter-top"><span id="encounterTitle">SELLOS DE HIELO</span><strong id="encounterValue"></strong></div><div class="encounter-meter"><i id="encounterMeter"></i></div><div class="encounter-runes" id="encounterRunes"></div><button type="button" id="inspectRune" class="encounter-inspect">✧ Investigar el entorno</button><p id="encounterClue" hidden></p></div><div id="aetherSceneDock"></div><div class="v5-projectile" aria-hidden="true"><i></i><b></b></div><span class="scenario-tag" id="scenarioTag">✧ EL SELLO DE GLACIES ✧</span>
+            <div id="v9VictoryFilm" class="v9-victory-film" hidden><video id="v9VictoryVideo" playsinline muted preload="none" aria-label="Transformación del santuario"></video><button id="v9Skip" type="button">Saltar secuencia →</button></div>
+            <div class="encounter-ui" id="encounterUI"><div class="encounter-top"><span id="encounterTitle">SELLOS DE HIELO</span><strong id="encounterValue"></strong></div><span class="v8-phase" id="v8BossPhase" hidden></span><div class="encounter-meter"><i id="encounterMeter"></i></div><div class="encounter-runes" id="encounterRunes"></div><button type="button" id="inspectRune" class="encounter-inspect">✧ Investigar el entorno</button><p id="encounterClue" hidden></p></div><div id="aetherSceneDock"></div><div class="v5-projectile" aria-hidden="true"><i></i><b></b></div><span class="scenario-tag" id="scenarioTag">✧ EL SELLO DE GLACIES ✧</span>
           </div>
           <aside class="puzzle-panel fantasy-panel" id="puzzlePanel">
             <div class="puzzle-head"><span class="chapter-label" id="roomChapterLabel">HABITACIÓN 1 DE 3</span><div id="roomHearts" class="hearts" aria-label="5 puntos de vida">♥ ♥ ♥ ♥ ♥</div></div>
@@ -129,14 +120,13 @@
             <div class="spell-counter"><span id="inputHelp">Puedes omitir tildes, mayúsculas y signos</span><span id="spellCount">0/180</span></div>
             <div class="game-actions">
               <button type="button" class="arcane-button secondary small" id="openGrimoire">▣ Grimorio</button>
-              <button type="button" class="arcane-button secondary small" id="hintButton">✧ Pista</button>
+              
             </div>
             <button type="button" class="practice-room-link" id="practiceFromRoom" hidden>Entrenamiento arcano</button>
             <button type="button" class="arcane-button primary cast-button" id="castButton"><span>✦</span> Lanzar conjuro</button>
             <div class="status-box" id="spellStatus" role="status" aria-live="polite">Escribe un conjuro completo y pulsa <strong>Lanzar</strong> para activar el AFD.</div>
             <button class="inline-action" type="button" id="validationButton" disabled>Ver el recorrido del autómata →</button><button type="button" class="arcane-button primary next-room-button" id="nextRoomButton" hidden>Continuar a la siguiente sala →</button>
           </aside>
-          <div class="room-success" id="roomSuccess" aria-live="polite" hidden><span>✧</span> ¡HABITACIÓN SUPERADA! <span>✧</span></div>
         </div>
         <p class="screen-footnote">✧ El poder se expresa en español. La dificultad determina las fórmulas y las ayudas de Aether.</p>
       </section>
@@ -215,7 +205,7 @@
             <article class="level-card locked" id="levelCard1"><div class="level-card-art fire-art"><span class="card-sigil">♨</span></div><div class="level-card-body"><p class="label-stage">HABITACIÓN II</p><h3>El guardián de fuego</h3><p id="levelProgress1">Un guardián impide el paso a la torre superior.</p><button type="button" class="arcane-button secondary" id="playRoom1" disabled>🔒 Bloqueada</button></div></article>
             <article class="level-card locked" id="levelCard2"><div class="level-card-art mist-art"><span class="card-sigil">≋</span></div><div class="level-card-body"><p class="label-stage">HABITACIÓN III</p><h3>La cámara de niebla</h3><p id="levelProgress2">Disipa la bruma para revelar la salida oculta.</p><button type="button" class="arcane-button secondary" id="playRoom2" disabled>🔒 Bloqueada</button></div></article>
           </div>
-          <section class="journey-rewards fantasy-panel" id="journeyRewards"></section><div class="progress-statline"><span>Intentos: <strong id="totalAttempts">0</strong></span><span>Errores sintácticos: <strong id="syntaxErrors">0</strong></span><span>Conjuros inadecuados: <strong id="puzzleErrors">0</strong></span><span>Modo: <strong id="progressMode">Intermedio</strong></span></div>
+          <section class="journey-rewards fantasy-panel" id="journeyRewards"></section><section class="v8-collection fantasy-panel" id="v8Collection" aria-label="Runas y hazañas"></section><div class="progress-statline"><span>Intentos: <strong id="totalAttempts">0</strong></span><span>Errores sintácticos: <strong id="syntaxErrors">0</strong></span><span>Conjuros inadecuados: <strong id="puzzleErrors">0</strong></span><span>Modo: <strong id="progressMode">Intermedio</strong></span></div>
         </div>
       </section>
     </main>
@@ -227,7 +217,7 @@
   </div>
   <dialog class="v6-cinematic" id="v6Cinematic" aria-labelledby="v6CinemaTitle"><div id="v6CinemaArt" class="v6-cinema-art"><video id="v6CinemaVideo" class="v6-cinema-video" playsinline muted hidden></video></div><div id="v6CinemaCaption" class="v6-cinema-caption"><span class="chapter-label">✧ SPELLSCRIPT · CRÓNICAS DEL TORREÓN ✧</span><h2 id="v6CinemaTitle"></h2><p></p><button type="button" class="arcane-button secondary" id="v6CinemaSkip">Continuar / Saltar →</button></div></dialog>
   <button type="button" id="v7PerfButton" aria-label="Mostrar rendimiento" title="Mostrar rendimiento">FPS</button><output id="v7FPS" hidden aria-live="off">—</output>
-  <script src="js/data.js"></script><script src="js/afd.js"></script><script src="js/game.js"></script><script src="js/music.js"></script>
-  <script src="js/writingRules.js"></script><script src="js/educationalAFD.js"></script><script src="js/writingAnalyzer.js"></script><script src="js/learningProgress.js"></script><script src="js/adaptiveTutor.js"></script><script src="js/practice.js"></script><script src="js/afdTutor.js"></script><script src="js/afdVisualizer.js"></script><script src="js/naturalSpells.js"></script><script src="js/adventureTutor.js"></script><script src="js/graphicsSettings.js"></script><script src="js/animationClock.js"></script><script src="js/sceneManager.js"></script><script src="js/companionAnimator.js"></script><script src="js/particleEngine.js"></script><script src="js/spellEffects.js"></script><script src="js/cinematicManager.js"></script><script src="js/app.js"></script>
+  <dialog id="v9VictoryDialog" class="v9-victory-dialog" aria-labelledby="v9VictoryTitle"><div class="v9-hero"><img id="v9VictoryImage" alt="Santuario liberado"><button id="v9Close" aria-label="Cerrar resumen" type="button">×</button></div><div class="v9-victory-content"><p id="v9VictoryChapter" class="v9-kicker"></p><h2 id="v9VictoryTitle"></h2><p id="v9VictorySubtitle"></p><div class="v9-rune"><span id="v9RuneIcon"></span><div><strong id="v9RuneName"></strong><small>Runa desbloqueada</small></div></div><div class="v9-stat-grid"><div class="v9-stat"><strong id="v9Solved"></strong><small>Acertijos</small></div><div class="v9-stat"><strong id="v9Lives"></strong><small>Vidas restantes</small></div><div class="v9-stat"><strong id="v9XP"></strong><small>XP del último reto</small></div></div><button id="v9Continue" type="button" class="arcane-button primary"></button><button id="v9Trace" class="inline-action" type="button">Consultar recorrido del AFD</button></div></dialog><script src="vendor/gsap.min.js"></script><script src="vendor/howler.min.js"></script><script src="vendor/pixi.min.js"></script><script src="js/v8Audio.js"></script><script src="js/data.js"></script><script src="js/afd.js"></script><script src="js/game.js"></script><script src="js/music.js"></script>
+  <script src="js/writingRules.js"></script><script src="js/educationalAFD.js"></script><script src="js/writingAnalyzer.js"></script><script src="js/learningProgress.js"></script><script src="js/adaptiveTutor.js"></script><script src="js/practice.js"></script><script src="js/afdTutor.js"></script><script src="js/afdVisualizer.js"></script><script src="js/naturalSpells.js"></script><script src="js/adventureTutor.js"></script><script src="js/graphicsSettings.js"></script><script src="js/animationClock.js"></script><script src="js/sceneManager.js"></script><script src="js/companionAnimator.js"></script><script src="js/particleEngine.js"></script><script src="js/spellEffects.js"></script><script src="js/cinematicManager.js"></script><script src="js/videoQualityManager.js"></script><script src="js/v8Backgrounds.js"></script><script src="js/v8Effects.js"></script><script src="js/v8Rewards.js"></script><script src="js/victoryDirector.js"></script><script src="js/app.js"></script>
 </body>
 </html>

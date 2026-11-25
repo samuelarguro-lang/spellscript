@@ -1,0 +1,10 @@
+/* V9: one active decoder; do not replay an ambient loop on top of a won room. */
+(function(){'use strict';const names={inicio:'castle',hielo:'ice',fuego:'fire',niebla:'mist'};let video=null,host=null,key=null;
+function clear(){if(!video)return;const v=video;video=null;host=null;key=null;v.pause();v.remove();v.removeAttribute('src');v.load();document.body.classList.remove('v8-video-active');}
+function sync(){const active=document.querySelector('.view.active'),scene=document.querySelector('#v6Scene');let next=active?.id==='view-inicio'?'inicio':active?.id==='view-aventura'?scene?.dataset.scene:null;const target=next==='inicio'?document.querySelector('.home-art'):scene;const src=next?SpellVideoQuality.source(names[next]):null;
+if(!next||!target||!src||SpellGraphics.get()!=='full'||(next!=='inicio'&&(scene.dataset.complete==='true'||scene.dataset.victory==='playing'))){clear();return;}
+if(document.hidden){video?.pause();return;}
+if(src!==key||target!==host||!video?.isConnected){clear();key=src;host=target;const v=document.createElement('video');video=v;v.className='v8-bg-video';v.setAttribute('aria-hidden','true');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.loop=true;v.preload='auto';v.src=src;v.addEventListener('playing',()=>{if(video===v){v.classList.add('ready');document.body.classList.add('v8-video-active');}});v.addEventListener('error',()=>{if(video===v)v.classList.remove('ready');});target.appendChild(v);}
+const candidate=video;if(candidate.paused)candidate.play().catch(()=>candidate.classList.remove('ready'));}
+function init(){const observer=new MutationObserver(sync);document.querySelectorAll('.view').forEach(e=>observer.observe(e,{attributes:true,attributeFilter:['class']}));observer.observe(document.querySelector('#v6Scene'),{attributes:true,attributeFilter:['data-scene','data-complete','data-victory'],childList:true});['spellgraphics','spellvideoquality','visibilitychange'].forEach(e=>document.addEventListener(e,sync));sync();}
+window.SpellVideoBackgrounds={init,sync,clear,active:()=>video};})();

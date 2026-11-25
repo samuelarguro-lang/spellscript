@@ -1,0 +1,6 @@
+{
+  "buildCommand": "bash scripts/prepare-release.sh --build",
+  "outputDirectory": "dist",
+  "installCommand": "true",
+  "framework": null
+}

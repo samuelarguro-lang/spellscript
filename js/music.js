@@ -2,7 +2,7 @@
    Música ambiental discreta, independiente de los efectos de lanzamiento. */
 (function(){
  'use strict';
- let context=null,master=null,enabled=false,volume=.25,theme='inicio',timer=null,nextTime=0;
+ let context=null,master=null,voiceMaster=null,enabled=false,volume=.75,theme='inicio',timer=null,nextTime=0;
  let active=[];
  const themes={
   inicio:{bass:130.81,notes:[261.63,392,329.63,293.66,349.23,329.63],wave:'sine',color:1600},
@@ -14,10 +14,10 @@
   if(context)return true;
   const C=window.AudioContext||window.webkitAudioContext;
   if(!C)return false;
-  context=new C();master=context.createGain();master.gain.value=volume*0.42;master.connect(context.destination);return true;
+  context=new C();master=context.createGain();master.gain.value=(window.SpellAudioMix?.get("effects")??.8)*.72;master.connect(context.destination);voiceMaster=context.createGain();voiceMaster.gain.value=(window.SpellAudioMix?.get('voice')??.68)*.7;voiceMaster.connect(context.destination);return true;
  }
  function stopNotes(){for(const node of active){try{node.osc.stop(Math.min(context.currentTime+.18,node.stopTime));}catch(e){}try{node.gain.gain.setTargetAtTime(0,context.currentTime,.08);}catch(e){}}active=[];}
- function note(freq,when,duration,amplitude,type='sine',cutoff=1600,pan=0){
+ function note(freq,when,duration,amplitude,type='sine',cutoff=1600,pan=0,bus='effects'){
   if(!context||!master)return;
   const osc=context.createOscillator(),gain=context.createGain(),filter=context.createBiquadFilter();
   const panner=context.createStereoPanner?context.createStereoPanner():null;
@@ -27,11 +27,11 @@
   gain.gain.exponentialRampToValueAtTime(Math.max(.0002,amplitude),when+Math.min(.8,duration*.3));
   gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
   osc.connect(filter);filter.connect(gain);
-  if(panner){panner.pan.value=pan;gain.connect(panner);panner.connect(master);}else gain.connect(master);
-  osc.start(when);osc.stop(when+duration+.05);active.push({osc,gain,stopTime:when+duration+.05});
+  const output=bus==='voice'?voiceMaster:master;if(panner){panner.pan.value=pan;gain.connect(panner);panner.connect(output);}else gain.connect(output);
+  osc.start(when);osc.stop(when+duration+.05);active.push({osc,gain,stopTime:when+duration+.05});osc.onended=()=>{active=active.filter(n=>n.osc!==osc);osc.disconnect();filter.disconnect();gain.disconnect();panner?.disconnect();};
  }
  function schedule(){
-  if(!enabled||!context)return;
+  if(!enabled||!context||window.SpellAudioMix?.available())return;
   const t=themes[theme]||themes.inicio;
   // 12 s de ambiente en cada iteración; las ondas son deliberadamente suaves.
   const start=Math.max(nextTime,context.currentTime+.05);
@@ -47,14 +47,15 @@
  }
  function enable(){
   if(!init())return false;
-  context.resume().catch(()=>{});enabled=true;nextTime=context.currentTime+.05;
-  schedule();if(timer)clearInterval(timer);timer=setInterval(()=>{if(enabled&&context.currentTime+4>nextTime)schedule();},900);
+  if(enabled)return true;
+  context.resume().catch(()=>{});enabled=true;window.SpellAudioMix?.setEnabled(true);nextTime=context.currentTime+.05;
+  schedule();if(timer)clearInterval(timer);if(!window.SpellAudioMix?.available())timer=setInterval(()=>{if(enabled&&context.currentTime+4>nextTime)schedule();},900);
   return true;
  }
- function disable(){enabled=false;if(timer)clearInterval(timer);timer=null;if(context)stopNotes();}
+ function disable(){enabled=false;window.SpellAudioMix?.setEnabled(false);if(timer)clearInterval(timer);timer=null;if(context)stopNotes();}
  function toggle(){if(enabled){disable();return false;}return enable();}
- function setTheme(value){const next=themes[value]?value:'inicio';if(theme===next)return;theme=next;if(enabled&&context){stopNotes();nextTime=context.currentTime+.15;schedule();}}
- function setVolume(next){volume=Math.max(0,Math.min(1,Number(next)||0));if(master&&context)master.gain.setTargetAtTime(volume*.42,context.currentTime,.04);}
+ function setTheme(value){const next=themes[value]?value:'inicio';window.SpellAudioMix?.theme(next);if(theme===next)return;theme=next;if(enabled&&context){stopNotes();nextTime=context.currentTime+.15;schedule();}}
+ function setVolume(next){volume=Math.max(0,Math.min(1,Number(next)||0));window.SpellAudioMix?.set("music",volume);}
  function spell(kind,element){
   if(!enabled||!context)return;
   const base=element==='fuego'?660:element==='hielo'?820:490;
@@ -93,6 +94,8 @@
  });
  function castSequence(element,accepted,correct){if(!enabled||!context)return;const root=element==='fire'?196:element==='ice'?293.66:246.94;const t=context.currentTime+.01;if(!accepted){note(150,t,.32,.065,'triangle',720);return;}[1,1.25,1.5].forEach((r,i)=>note(root*r,t+i*.18,.55,.045,'sine',2100,i%2?.2:-.2));note(root*2,t+.74,.43,.06,'triangle',2400,-.25);note(root*.5,t+1.18,.55,.10,'triangle',500,.1);if(correct){note(root*2,t+1.2,.65,.07,'sine',2800,.3);note(root*3,t+1.36,.5,.045,'sine',3100,-.3);}else note(130,t+1.18,.35,.06,'triangle',500);}
  function effectPhase(phase,element,correct){if(!enabled||!context)return;const t=context.currentTime+.005,root=element==='fire'?196:element==='ice'?293.66:246.94;if(phase==='charge'){[1,1.25,1.5,2].forEach((r,i)=>note(root*r,t+i*.15,.45,.043,'sine',2100));}else if(phase==='launch'){note(root*2,t,.23,.075,'triangle',2600,-.2);note(root,t+.06,.22,.045,'sine',1400);}else{note(root*.5,t,.47,.09,'triangle',580);if(correct)[2,2.5,3].forEach((r,i)=>note(root*r,t+.08*i,.5,.044,'sine',2600));}}
- function companion(happy){if(!enabled||!context)return;const t=context.currentTime+.01;[1,1.18,happy?1.5:1.12].forEach((r,i)=>note(520*r,t+i*.095,.10,.014,'sine',2600));}
- window.SpellMusic={effectPhase,companion,castSequence,toggle,enable,disable,setTheme,setVolume,spell,reward,isEnabled:()=>enabled,getVolume:()=>volume};
+ function setEffectsVolume(v){window.SpellAudioMix?.set("effects",v);if(master&&context)master.gain.setTargetAtTime(v*.72,context.currentTime,.04);}
+ function setVoiceVolume(v){window.SpellAudioMix?.set('voice',v);if(voiceMaster&&context)voiceMaster.gain.setTargetAtTime(v*.7,context.currentTime,.04);}
+ function companion(happy){if(!enabled||!context)return;const t=context.currentTime+.01;[1,1.18,happy?1.5:1.12].forEach((r,i)=>note(520*r,t+i*.095,.10,.035,'sine',2600,0,'voice'));}
+ window.SpellMusic={setVoiceVolume,setEffectsVolume,effectPhase,companion,castSequence,toggle,enable,disable,setTheme,setVolume,spell,reward,isEnabled:()=>enabled,getVolume:()=>window.SpellAudioMix?.get("music")??volume};
 })();

@@ -1,0 +1,104 @@
+[
+  {
+    "room": "ice",
+    "video": {
+      "src": "assets/loops/ice.mp4",
+      "time": 2.371152,
+      "ready": 4,
+      "paused": false
+    },
+    "after": 2.275216,
+    "engine": "PixiJS",
+    "idle": {
+      "fps": 6.1858986254933255,
+      "averageMs": 161.658,
+      "p95Ms": 599.9000000000001,
+      "samples": 50
+    },
+    "moving": {
+      "fps": 4.528499755699356,
+      "averageMs": 220.8236842105263,
+      "p95Ms": 833.2000000000007,
+      "samples": 76
+    },
+    "audio": {
+      "playing": true,
+      "volume": 0.6312,
+      "source": "assets/audio/hielo.mp3",
+      "actual": [
+        0.6312
+      ]
+    },
+    "solved": true,
+    "errors": [],
+    "bad": []
+  },
+  {
+    "room": "fire",
+    "video": {
+      "src": "assets/loops/fire.mp4",
+      "time": 2.800499,
+      "ready": 4,
+      "paused": false
+    },
+    "after": 1.854135,
+    "engine": "PixiJS",
+    "idle": {
+      "fps": 4.277393736469771,
+      "averageMs": 233.78722222222225,
+      "p95Ms": 600,
+      "samples": 180
+    },
+    "moving": {
+      "fps": 3.882255504175582,
+      "averageMs": 257.5822222222222,
+      "p95Ms": 750,
+      "samples": 180
+    },
+    "audio": {
+      "playing": true,
+      "volume": 0.6312,
+      "source": "assets/audio/fuego.mp3",
+      "actual": [
+        0.6312
+      ]
+    },
+    "solved": true,
+    "errors": [],
+    "bad": []
+  },
+  {
+    "room": "mist",
+    "video": {
+      "src": "assets/loops/mist.mp4",
+      "time": 0.427446,
+      "ready": 4,
+      "paused": false
+    },
+    "after": 4.01699,
+    "engine": "PixiJS",
+    "idle": {
+      "fps": 4.895934198644371,
+      "averageMs": 204.2511111111111,
+      "p95Ms": 400.1000000000058,
+      "samples": 180
+    },
+    "moving": {
+      "fps": 4.61557397226553,
+      "averageMs": 216.65777777777774,
+      "p95Ms": 466.79999999998836,
+      "samples": 180
+    },
+    "audio": {
+      "playing": true,
+      "volume": 0.6312,
+      "source": "assets/audio/niebla.mp3",
+      "actual": [
+        0.6312
+      ]
+    },
+    "solved": true,
+    "errors": [],
+    "bad": []
+  }
+]

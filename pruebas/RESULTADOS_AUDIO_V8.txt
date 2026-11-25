@@ -1,0 +1,12 @@
+=== inicio ===
+[Parsed_volumedetect_0 @ 0x55f36be71dc0] mean_volume: -20.1 dB
+[Parsed_volumedetect_0 @ 0x55f36be71dc0] max_volume: -3.6 dB
+=== hielo ===
+[Parsed_volumedetect_0 @ 0x55eb333d6dc0] mean_volume: -18.9 dB
+[Parsed_volumedetect_0 @ 0x55eb333d6dc0] max_volume: -3.6 dB
+=== fuego ===
+[Parsed_volumedetect_0 @ 0x55e2a88fadc0] mean_volume: -18.3 dB
+[Parsed_volumedetect_0 @ 0x55e2a88fadc0] max_volume: -1.5 dB
+=== niebla ===
+[Parsed_volumedetect_0 @ 0x560fe6cf9dc0] mean_volume: -19.1 dB
+[Parsed_volumedetect_0 @ 0x560fe6cf9dc0] max_volume: -4.2 dB

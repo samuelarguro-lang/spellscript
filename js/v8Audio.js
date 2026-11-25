@@ -1,0 +1,13 @@
+/* Licensed package Howler bundled locally; generated original themes. */
+(function(){'use strict';const K='spellscript-v8-audio';let cfg={music:.75,effects:.80,voice:.68,ambient:.30,muted:false};try{const saved=JSON.parse(localStorage.getItem(K)||'null');if(saved)for(const k of Object.keys(cfg))if(typeof saved[k]===typeof cfg[k])cfg[k]=k==='muted'?saved[k]:Math.max(0,Math.min(1,saved[k]));}catch(_){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(cfg));}catch(_){}};
+let current=null,theme='inicio',enabled=false,level=0;const tracks={},ambients={};let ambientCurrent=null;let generation=0;const clamp=x=>Math.max(0,Math.min(1,Number(x)||0));const target=()=>cfg.music*(.78+level*.22);
+function get(k){if(!tracks[k]&&window.Howl)tracks[k]=new Howl({src:['assets/audio/'+k+'.mp3'],html5:true,loop:true,preload:false,volume:0});return tracks[k];}
+function ambient(k){if(!window.Howl)return;let next=ambients[k]||(ambients[k]=new Howl({src:['assets/audio/ambient-'+k+'.mp3'],html5:true,loop:true,preload:false,volume:cfg.ambient*.35}));if(ambientCurrent!==next){ambientCurrent?.pause();ambientCurrent=next;}next.volume(cfg.ambient*.35);if(!next.playing())next.play();}
+function switchTo(k){theme=k;if(!enabled||document.hidden)return;ambient(k);const next=get(k);if(!next)return;if(current===next&&next.playing()){next.fade(next.volume(),target(),350);return;}if(current===next&&next.state()==='loading')return;const token=++generation;const old=current;current=next;if(old&&old!==next){old.fade(old.volume(),0,450);setTimeout(()=>{if(current!==old)old.pause();},500);}next.volume(0);const id=next.play();const fade=()=>{if(token===generation&&current===next&&enabled)next.fade(next.volume(),target(),700);};if(next.playing(id))fade();else next.once('play',fade,id);}
+function setEnabled(on){enabled=!!on;cfg.muted=!enabled;save();if(enabled)switchTo(theme);else{generation++;[...Object.values(tracks),...Object.values(ambients)].forEach(t=>t.pause());current=null;}}
+function set(k,v){if(!['music','effects','voice','ambient'].includes(k))return;cfg[k]=clamp(v);save();if(k==='music'&&current)current.volume(target());if(k==='ambient'&&ambientCurrent)ambientCurrent.volume(cfg.ambient*.35);}
+function intensity(v){level=clamp(v);if(enabled&&current&&current.playing())current.fade(current.volume(),target(),500);}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){generation++;[...Object.values(tracks),...Object.values(ambients)].forEach(t=>t.pause());}else if(enabled)switchTo(theme);});
+window.SpellAudioMix={setEnabled,theme:switchTo,set,get:k=>cfg[k],intensity,available:()=>Boolean(window.Howl),playing:()=>Boolean(current?.playing()),current:()=>current,settings:()=>({...cfg})};
+})();

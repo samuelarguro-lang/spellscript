@@ -11,7 +11,7 @@
  let tutorAdvice=null, tutorPuzzle=null;const cinemaSeen=new Set();
  const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let route='inicio',previousRoute='aventura',reducedMotion=window.SpellGraphics.get()!=='full';
- let busy=false,toastTimer=null,transitionTimer=null,visitedGrimoire=false,tutorialStep=0,tutorialOpen=false,returnFromTutorial=false;
+ let previousLives=null;let busy=false,toastTimer=null,transitionTimer=null,visitedGrimoire=false,tutorialStep=0,tutorialOpen=false,returnFromTutorial=false;
  let reviewRoomIndex=null,reviewChallengeIndex=0,archiveResult=null,doorOpening=false;
  let practiceRoom=0,educationResult=null,selectedPracticeId=null,tutorialPracticeDone=false;
  const shownRoomIndex=()=>reviewRoomIndex===null?state.currentRoom:reviewRoomIndex;
@@ -20,10 +20,10 @@
  const hearts=()=>Array.from({length:G.maxLives()},(_,i)=>`<span class="${i<state.lives?'':'lost'}" aria-hidden="true">♥</span>`).join(' ');
  const hints={facil:'Las pistas pueden indicar elemento, fuerza y acción.',normal:'Las pistas explican el significado, sin dar la frase exacta.',dificil:'Los acertijos se expresan con metáforas y la pista es más críptica.'};
  function toast(text){const e=$('#toast');e.textContent=text;e.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove('show'),3000);}
- function openModal(title,html){$('#modalTitle').textContent=title;$('#modalBody').innerHTML=html;$('#modalBackdrop').hidden=false;$('#modalClose').focus();}
+ function openModal(title,html){$('#modalTitle').textContent=title;$('#modalBody').innerHTML=html;$('#modalBackdrop').hidden=false;if($('#v9VideoQuality'))$('#v9VideoQuality').value=SpellVideoQuality.get();$('#modalClose').focus();}
  function closeModal(){$('#modalBackdrop').hidden=true;}
  function playSound(kind,element){M.spell(kind,element);}
- function updateAudio(){const on=M.isEnabled();$('#audioButton').classList.toggle('is-on',on);$('#audioButton').textContent=on?'♫':'♩';$('#audioButton').setAttribute('aria-label',on?'Desactivar música y efectos':'Activar música suave y efectos');$('#audioButton').title=on?'Silenciar música ambiental':'Activar música ambiental';}
+ function updateAudio(){const on=M.isEnabled();$('#audioButton').classList.toggle('is-on',on);$('#audioButton').textContent=on?'♫':'♩';$('#audioButton').setAttribute('aria-label',on?'Desactivar música y efectos':'Activar música y efectos');$('#audioButton').title=on?'Silenciar música y efectos':'Activar música y efectos';}
  function navigate(target){
   if(!$('#view-'+target))return;
   if((busy||doorOpening)&&target!==route){toast('✧ Espera a que el conjuro termine su animación.');return;}
@@ -37,7 +37,8 @@
   if(route==='validacion')renderValidation();
   if(route==='progreso')renderProgress();
   if(route==='practica')renderPractice();
-  if(route==='grimorio'){renderLearningStats();renderBook();}
+  if(route==='grimorio'){renderLearningStats();renderBook();const col=$('#v8Collection');$('#learningGrimoire').after(col);window.SpellRewardsV8.render();}
+  if(route==='progreso'){$('#journeyRewards').after($('#v8Collection'));window.SpellRewardsV8.render();}
   M.setTheme(route==='aventura'||route==='validacion'?D.rooms[shownRoomIndex()].id:route==='practica'?D.rooms[practiceRoom].id:'inicio');
   window.scrollTo({top:0,behavior:'instant'});
   $('#mainContent').focus({preventScroll:true});
@@ -97,7 +98,7 @@
   {icon:'✎',title:'Comas y conectores',eyebrow:'05 · ESCRITURA EN ESPAÑOL',body:'Los conectores son obligatorios cuando la fórmula los necesita. En Difícil la condición inicial exige coma. Aether te acompaña cuando tropiezas. Por ejemplo, «Si el hielo se derrite, podremos entrar» lleva coma después de la condición inicial.'},
   {icon:'◇',title:'Aprende de los errores',eyebrow:'06 · TUTOR DEL AFD',body:'En el panel del autómata verás de dónde sale una transición, <strong>qué símbolo lee</strong>, a qué estado llega y cómo corregir el error. Aether te ayuda dentro de la aventura. El grimorio incluye <strong>Mi progreso como escritor</strong> y recomendaciones basadas en tus intentos de aventura y entrenamiento.'},
   {icon:'✦',title:'Una práctica antes de salir',eyebrow:'07 · PRÁCTICA INTERACTIVA',body:'Completa la frase del taller escribiendo una coma: <strong>«Si hay hielo, caminaremos despacio.»</strong><div class="tutorial-mini"><label for="tutorialMiniInput">Completa: «Si hay hielo caminaremos despacio.»</label><input id="tutorialMiniInput" type="text" placeholder="Escribe aquí la oración corregida" autocomplete="off"><button type="button" id="tutorialMiniCheck" class="arcane-button secondary small">✓ Comprobar sin perder vidas</button><p id="tutorialMiniMessage" role="status">Practicar es opcional, pero te prepara para el AFD educativo.</p></div>'},
-  {icon:'⚔',title:'¡Ya puedes comenzar!',eyebrow:'08 · LISTO PARA LANZAR',body:'Lee el acertijo, consulta el grimorio y utiliza pistas sin penalización. Los desafíos siguen intactos y el entrenamiento arcano es opcional. ¡Abre el primer sello!'}
+  {icon:'⚔',title:'¡Ya puedes comenzar!',eyebrow:'08 · LISTO PARA LANZAR',body:'Lee el acertijo, consulta el grimorio y pide consejo a Aether sin penalización. Los desafíos siguen intactos y el entrenamiento arcano es opcional. ¡Abre el primer sello!'}
  ];
  function showTutorial(step=tutorialStep){
   tutorialStep=Math.max(0,Math.min(tutorialPages.length-1,step));tutorialOpen=true;
@@ -116,6 +117,7 @@
  function renderHearts(){
   $('#roomHearts').innerHTML=hearts();$('#headerLives').innerHTML=hearts();
   $('#roomHearts').setAttribute('aria-label',`${state.lives} de ${G.maxLives()} puntos de vida`);
+  if(previousLives!==null&&state.lives<previousLives&&SpellGraphics.get()==='full'){const lost=$('#roomHearts .lost');lost?.animate([{opacity:1,transform:'scale(1.25)'},{opacity:.4,transform:'scale(1)'}],{duration:380,easing:'ease-out'});}previousLives=state.lives;
   $('#headerLives').setAttribute('aria-label',`${state.lives} de ${G.maxLives()} puntos de vida`);
  }
  function moveAether(){const card=$('#aetherCard');const target=window.innerWidth>1050?$('#aetherSceneDock'):$('#aetherMobileDock');if(card.parentElement!==target)target.appendChild(card);}
@@ -127,7 +129,7 @@
   $('#encounterUI').dataset.kind=D.rooms[room].id;$('#roomScreen').style.setProperty('--room-reveal',done/total);$('#inspectRune').disabled=won;
   $('#inspectRune').textContent=['✧ Examinar cristal','✧ Estudiar al guardián','✧ Revelar inscripción'][room];
  }
- function showAether(advice){if(!advice?.show){if(advice?.kind==='error'){tutorAdvice=null;$('#aetherMood').textContent='GUÍA ARCANO';$('#aetherMessage').textContent='Consulta las pistas de la escena o el recorrido del autómata.';$('#aetherApply').hidden=true;}return;}tutorAdvice=advice;$('#aetherMood').textContent=advice.kind==='success'?'¡MAGIA DESPIERTA!':'CONSEJO ARCANO';$('#aetherMessage').textContent=advice.message+(advice.gain?' +'+advice.gain+' XP':'');$('#aetherBuild').hidden=!(state.difficulty==='facil'&&(advice.guide||advice.kind!=='success'));$('#aetherApply').hidden=!advice.suggestion||state.difficulty!=='facil';const card=$('#aetherCard');card.classList.remove('aether-react');void card.offsetWidth;card.classList.add('aether-react');}
+ function showAether(advice){if(!advice?.show){if(advice?.kind==='error'){tutorAdvice=null;$('#aetherMood').textContent='GUÍA ARCANO';$('#aetherMessage').textContent='Pídeme consejo o examina el recorrido del autómata.';$('#aetherApply').hidden=true;}return;}tutorAdvice=advice;$('#aetherMood').textContent=advice.kind==='success'?'¡MAGIA DESPIERTA!':'CONSEJO ARCANO';$('#aetherMessage').textContent=advice.message+(advice.gain?' +'+advice.gain+' XP':'');$('#aetherBuild').hidden=!(state.difficulty==='facil'&&(advice.guide||advice.kind!=='success'));$('#aetherApply').hidden=!advice.suggestion||state.difficulty!=='facil';const card=$('#aetherCard');card.classList.remove('aether-react');void card.offsetWidth;card.classList.add('aether-react');}
  function buildSpell(){const b=$('#spellBuilder');b.hidden=false;b.innerHTML=`<p>Elige las tres piezas de tu conjuro:</p><div class="builder-fields"><label>Elemento<select id="buildElement">${N.elements.map((v,i)=>`<option value="${i}">${v}</option>`).join('')}</select></label><label>Acción<select id="buildAction">${N.verbs.map((v,i)=>`<option value="${i}">${v}</option>`).join('')}</select></label><label>Fuerza<select id="buildForce">${N.forces.map((v,i)=>`<option value="${i}">${v}</option>`).join('')}</select></label></div><button type="button" id="buildInsert" class="arcane-button secondary small">Preparar conjuro</button>`;$('#buildInsert').onclick=()=>{if(busy)return;const solution={invocation:D.invocations[+$('#buildElement').value],action:D.actions[+$('#buildAction').value],circle:D.circles[+$('#buildForce').value]};$('#spellInput').value=N.example(solution,state.difficulty);$('#spellInput').dispatchEvent(new Event('input'));b.hidden=true;$('#spellInput').focus();};}
  function renderBook(){const mode=state.difficulty;$('#bookNaturalFormula').textContent=N.describe(mode);const sample={invocation:D.invocations[0],circle:D.circles[1],action:D.actions[0]};$('#spellVariants').innerHTML=`<h3>✦ Fórmulas del ${safe(modeInfo().label)}</h3><p>Distintas expresiones pueden producir el mismo efecto. Cambia elemento, acción e intensidad según el enigma. Intensidad: «con un soplo de poder» (leve), «con renovada fuerza» (media), «con todo su poder» (máxima).</p>${(T.stats().xp>=450?[0,1,2]:T.stats().xp>=180?[0,1]:[0]).map(i=>`<div class="spell-example">${safe(N.example(sample,mode,i))}</div>`).join('')}<p>Rango ${safe(T.rank())}. ${T.stats().xp>=180?'Has desbloqueado el folio de fórmulas alternativas: ': 'Al alcanzar Invocador (180 XP) desbloquearás el folio de fórmulas alternativas.'}${T.stats().xp>=180?safe(N.example(sample,mode,1)) : ''} Ningún hechizo necesario está bloqueado.</p><div class="spell-example">Acciones: ${N.epicActions.map(safe).join(" · ")}</div>`;}
  function renderRewards(){const r=T.stats(),rank=T.rank(),next=r.xp<180?180:r.xp<450?450:r.xp<900?900:900;$('#journeyRewards').innerHTML=`<div class="reward-rank"><span class="rank-emblem">${rank==='Archimago'?'♛':rank==='Hechicero'?'✵':'✦'}</span><div><strong>${safe(rank)}</strong><p>${r.xp} XP · ${r.xp>=900?'Rango máximo':next+' XP para el siguiente rango'}</p><div class="xp-track"><i style="width:${Math.min(100,r.xp/next*100)}%"></i></div></div></div><div class="reward-stats"><span>✦ ${r.unlocked} retos únicos</span><span>◇ ${r.discovered} secretos</span><span>⚡ ${r.best} mejor racha</span><span>✓ ${r.corrections} correcciones</span></div>`;}
@@ -172,7 +174,9 @@
   $('#spellInput').placeholder=state.difficulty==='dificil'?'Aunque el camino esté cerrado, que…':state.difficulty==='normal'?'Que el … despierte y …':'Que el …';
   $('#aetherCard').hidden=reviewing;$('#encounterUI').hidden=reviewing;
   if(tutorPuzzle!==puzzle.id){tutorPuzzle=puzzle.id;$('#aetherMessage').textContent='Examina la escena. ¿Qué elemento, fuerza y acción necesitas?';$('#aetherMood').textContent='GUÍA ARCANO';$('#spellBuilder').hidden=true;$('#aetherBuild').hidden=state.difficulty!=='facil';$('#aetherApply').hidden=true;$('#encounterClue').hidden=true;tutorAdvice=null;}
-  renderEncounter(roomIndex,step,won);window.SpellScenes.render(room.id,reviewing?G.totalChallenges():step,G.totalChallenges());
+  renderEncounter(roomIndex,step,won);
+  window.SpellAudioMix.intensity(won?.9:step>=G.totalChallenges()-1?.82:.28+step/G.totalChallenges()*.28);
+  const phase=$('#v8BossPhase');phase.hidden=roomIndex!==1;const ratio=step/G.totalChallenges();phase.textContent=won?'DERROTADO':ratio>=.65?'FASE III · NÚCLEO EXPUESTO':ratio>=.3?'FASE II · FURIA':'FASE I · DESPERTAR';stage.dataset.bossPhase=won?'defeated':ratio>=.65?'3':ratio>=.3?'2':'1';window.SpellScenes.render(room.id,reviewing?G.totalChallenges():doorOpening&&won?step-1:step,G.totalChallenges());
   if(reviewing){
    $('#spellInput').value=archiveResult?.text||'';
    $('#spellCount').textContent=`${[...$('#spellInput').value].length}/180`;
@@ -181,7 +185,6 @@
     ?'Este progreso proviene de una partida anterior: se muestra un ejemplo canónico, no un intento guardado.'
     :'Conjuro superado en tu partida. Abre el AFD para consultar cada transición.';
   }
-  $('#roomSuccess').hidden=reviewing||!won||doorOpening;
   $('#nextRoomButton').hidden=reviewing||!won||doorOpening;
   $('#nextRoomButton').textContent=roomIndex===2?'✧ Ver tu victoria final →':'Continuar a la siguiente sala →';
   $('#validationButton').disabled=reviewing?!archiveResult:!state.lastResult;
@@ -228,29 +231,23 @@
   banner.classList.remove('burst');void banner.offsetWidth;banner.classList.add('burst');
   setTimeout(()=>{banner.hidden=true;banner.classList.remove('burst');},reducedMotion?450:1700);
  }
- function openDoorCeremony(result){
-  doorOpening=true;
-  const room=D.rooms[result.roomIndex],stage=$('#roomScreen');
-  renderRoom();
-  const portal=$('#roomPortal');portal.hidden=false;
-  stage.classList.remove('completed');stage.classList.add('opening-door');
-  M.reward('door',room.id);
-  setStatus('correct',`✧ ¡${room.name} completada! El portal arcano se está abriendo...`);
-  transitionTimer=setTimeout(()=>{
-   stage.classList.remove('opening-door');portal.hidden=true;doorOpening=false;
-   renderRoom();
-   setStatus('correct',`✧ ¡El portal de ${room.name} se abrió! Puedes continuar o revisar los recorridos en Progreso.`);
-   toast(`✦ ${room.name} superada · portal abierto`);
-   if(result.roomIndex===2){
-    M.reward('victory',room.id);window.SpellCinema.play('niebla');
-    // La victoria se muestra solo cuando el jugador pulse el botón: primero ve abrirse la puerta.
-   }
-  },reducedMotion?500:3100);
+ function openDoorCeremony(result,advice,reward){
+  doorOpening=true;renderRoom();$('#riddleCelebration').hidden=true;
+  const combo=$('.v8-combo');if(combo){clearTimeout(combo._hide);combo.hidden=true;}
+  const room=D.rooms[result.roomIndex];M.reward('door',room.id);
+  setStatus('correct','El último sello ha cedido. Contempla la transformación del santuario.');
+  SpellVictory.play(result.roomIndex,()=>{
+   doorOpening=false;renderRoom();setStatus('correct','Santuario liberado. Puedes continuar o consultar tu recorrido.');
+   if(advice)showAether(advice);
+   if(result.roomIndex===2)M.reward('victory',room.id);
+   SpellVictory.show(result.roomIndex,{solved:state.progress[result.roomIndex]+'/'+G.totalChallenges(),lives:state.lives+'/'+G.maxLives(),xp:(advice?.gain||0)+(reward?.bonus||0)},{next:()=>{if(result.roomIndex===2)navigate('progreso');else nextRoom();},trace:()=>navigate('validacion')});
+  });
  }
  function cast(){
   if(busy||isReviewing())return;
   const puzzle=G.currentPuzzle();const result=G.cast($('#spellInput').value);
   const advice=T.consume(result,puzzle,state.difficulty);
+  const reward=window.SpellRewardsV8.record(result,puzzle,state,G.totalChallenges());
   if(result.kind==='empty'){setStatus('neutral',result.message);$('#spellInput').focus();return;}
   if(result.kind==='already-solved'){toast(result.message);return;}
   $('#riddleCelebration').hidden=true;
@@ -267,12 +264,13 @@
   $('#validationButton').disabled=true;
   clearTimeout(transitionTimer);
   const finishCast=()=>{
-   clearCasting();busy=false;renderRoom();
+   clearCasting();busy=false;if(result.completedRoom)doorOpening=true;renderRoom();
    setStatus(result.kind,result.message);$('#validationButton').disabled=false;
-   if(advice)showAether(advice);
+   if(advice&&!result.completedRoom)showAether(advice);
    if(result.kind==='correct'){
+    if(reward&&!result.completedRoom)showV8Reward(reward);
     $('#spellInput').value='';$('#spellCount').textContent='0/180';
-    if(result.completedRoom){openDoorCeremony(result);}
+    if(result.completedRoom){openDoorCeremony(result,advice,reward);}
     else{
      M.reward('riddle',D.rooms[result.roomIndex].id);
      showRiddleCelebration();
@@ -283,7 +281,8 @@
     openModal('✧ El poder se ha agotado',`<p>Esta sala ha reiniciado sus acertijos y tienes otra oportunidad con <strong>${G.maxLives()} puntos de vida</strong>.</p><p class="modal-note">El progreso de las habitaciones anteriores se ha conservado.</p>`);
    }else toast(result.kind==='wrong-choice'?'Conjuro válido, elección equivocada: −2 PV':'Cadena no reconocida: −1 PV');
   };
-  window.SpellEffects.launch(element,result,finishCast);
+  window.SpellAudioMix.intensity(.95);
+  window.SpellEffects.launch(element,result,()=>{window.SpellAudioMix.intensity(state.progress[state.currentRoom]>=G.totalChallenges()-1?.9:.4);finishCast();});
  }
  function celebrateVictory(){
   const suffix=state.difficulty==='dificil'?'como un auténtico archimago':'con valentía y sabiduría';
@@ -292,7 +291,7 @@
  function nextRoom(){
   if(busy||doorOpening||isReviewing())return;
   if(state.currentRoom===2&&state.solved[2]){celebrateVictory();return;}
-  if(G.nextRoom()){setStatus('neutral','Nuevo santuario: observa el acertijo y consulta el grimorio.');$('#spellInput').value='';$('#spellCount').textContent='0/180';navigate('aventura');toast(`Capítulo ${state.currentRoom+1} · ${D.rooms[state.currentRoom].name}`);}
+  if(G.nextRoom()){const stage=$('#roomScreen');if(SpellGraphics.get()==='full')stage.animate([{opacity:.25,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:500,easing:'ease-out'});setStatus('neutral','Nuevo santuario: observa el acertijo y consulta el grimorio.');$('#spellInput').value='';$('#spellCount').textContent='0/180';navigate('aventura');toast(`Capítulo ${state.currentRoom+1} · ${D.rooms[state.currentRoom].name}`);}
  }
  function summarizeNodes(result){
   if(!result?.dfa)return '<span class="state-node first">q0</span><span class="state-arrow">→</span><span>?</span>';
@@ -323,6 +322,7 @@
   window.SpellAFDView.render(r);
  }
  function renderProgress(){
+  window.SpellRewardsV8.render();
   const total=G.totalChallenges()*3,completed=state.progress.reduce((a,b)=>a+b,0),won=state.solved.filter(Boolean).length;
   $('#progressBar').style.width=`${Math.round(completed/total*100)}%`;
   $('#progressText').textContent=`${completed} de ${total} acertijos · ${won}/3 salas`;
@@ -349,8 +349,7 @@
    particle.style.setProperty('--x',((i*41+12)%100)+'%');particle.style.setProperty('--size',(8+i%9)+'px');particle.style.setProperty('--speed',(7+i%7)+'s');particle.style.setProperty('--delay',(-i*1.23)+'s');particle.style.setProperty('--wind',((i%2?-1:1)*(23+i%50))+'px');container.appendChild(particle);
   }
  }
- function makeParticles(){const container=$('#particles');container.replaceChildren();if(reducedMotion)return;const count=window.innerWidth<=720?16:27;for(let i=0;i<count;i++){const el=document.createElement('i');el.className='particle';el.style.left=((i*37+13)%99)+'%';el.style.top=((i*29+17)%98)+'%';el.style.setProperty('--duration',(8+i%9)+'s');el.style.setProperty('--delay',(-i*.7)+'s');el.style.setProperty('--drift',(-28+i%8*9)+'px');container.appendChild(el);}}
- function setReducedMotion(value){window.SpellGraphics.set(value?'reduced':'full');}function updateGraphics(){reducedMotion=window.SpellGraphics.get()!=='full';makeParticles();}document.addEventListener('spellgraphics',updateGraphics);document.addEventListener('visibilitychange',()=>document.body.classList.toggle('v6-paused',document.hidden));
+ function setReducedMotion(value){window.SpellGraphics.set(value?'reduced':'full');}function updateGraphics(){reducedMotion=window.SpellGraphics.get()!=='full';}document.addEventListener('spellgraphics',updateGraphics);document.addEventListener('visibilitychange',()=>document.body.classList.toggle('v6-paused',document.hidden));
 
  function renderLearningStats(){
   const stats=window.SpellLearningProgress.stats(),slots=$('#learningStats');if(!slots)return;
@@ -391,7 +390,7 @@
  }
 
  function showSettings(){
-  openModal('⚙ Configuración del aprendiz',`<div class="settings-fields"><label class="settings-row">Dificultad <select id="difficultyInSettings"><option value="facil" ${state.difficulty==='facil'?'selected':''}>Fácil · Aprendiz</option><option value="normal" ${state.difficulty==='normal'?'selected':''}>Intermedio · Aventurero</option><option value="dificil" ${state.difficulty==='dificil'?'selected':''}>Difícil · Archimago</option></select></label><p class="modal-note">Cambiar la dificultad después de comenzar reinicia la partida porque modifica el número de enigmas.</p><div class="settings-row"><span>♫ Música ambiental</span><button type="button" id="settingsAudioButton" class="arcane-button secondary small">${M.isEnabled()?'Desactivar':'Activar'}</button></div><label class="settings-row">Volumen <input type="range" id="volumeRange" min="0" max="100" value="${Math.round(M.getVolume()*100)}" aria-label="Volumen de la música"/><span id="volumeValue">${Math.round(M.getVolume()*100)}%</span></label><label class="settings-row">Animaciones <select id="graphicsMode"><option value="full" ${window.SpellGraphics.get()==='full'?'selected':''}>Completas (predeterminado)</option><option value="reduced" ${window.SpellGraphics.get()==='reduced'?'selected':''}>Reducidas</option><option value="off" ${window.SpellGraphics.get()==='off'?'selected':''}>Sin animaciones</option></select></label><label class="settings-row">Recomendaciones personalizadas <input type="checkbox" id="learningRecommendations" ${window.SpellLearningProgress.enabled()?'checked':''}/></label><button type="button" class="arcane-button secondary" id="clearLearningButton">✎ Borrar solo el historial de aprendizaje</button><button type="button" class="arcane-button secondary" id="replayTutorial">✧ Repetir tutorial</button><button type="button" class="arcane-button secondary" id="resetGameButton">↻ Reiniciar partida</button></div>`);
+  openModal('⚙ Configuración del aprendiz',`<div class="settings-fields"><label class="settings-row">Dificultad <select id="difficultyInSettings"><option value="facil" ${state.difficulty==='facil'?'selected':''}>Fácil · Aprendiz</option><option value="normal" ${state.difficulty==='normal'?'selected':''}>Intermedio · Aventurero</option><option value="dificil" ${state.difficulty==='dificil'?'selected':''}>Difícil · Archimago</option></select></label><p class="modal-note">Cambiar la dificultad después de comenzar reinicia la partida porque modifica el número de enigmas.</p><div class="settings-row"><span>♫ Banda sonora</span><button type="button" id="settingsAudioButton" class="arcane-button secondary small">${M.isEnabled()?'Desactivar':'Activar'}</button></div><label class="settings-row">Volumen <input type="range" id="volumeRange" min="0" max="100" value="${Math.round(M.getVolume()*100)}" aria-label="Volumen de la música"/><span id="volumeValue">${Math.round(M.getVolume()*100)}%</span></label><div class="v8-mix">${[['effects','Efectos de hechizos'],['voice','Voz de Aether'],['ambient','Ambiente']].map(([k,label])=>`<label>${label}<input type="range" data-mix="${k}" min="0" max="100" value="${Math.round(SpellAudioMix.get(k)*100)}"><output>${Math.round(SpellAudioMix.get(k)*100)}%</output></label>`).join('')}</div><label class="settings-row">Calidad de fondo <select id="v9VideoQuality"><option value="auto">Automática</option><option value="high">Alta</option><option value="medium">Media</option><option value="low">Estática</option></select></label><label class="settings-row">Animaciones <select id="graphicsMode"><option value="full" ${window.SpellGraphics.get()==='full'?'selected':''}>Completas (predeterminado)</option><option value="reduced" ${window.SpellGraphics.get()==='reduced'?'selected':''}>Reducidas</option><option value="off" ${window.SpellGraphics.get()==='off'?'selected':''}>Sin animaciones</option></select></label><label class="settings-row">Recomendaciones personalizadas <input type="checkbox" id="learningRecommendations" ${window.SpellLearningProgress.enabled()?'checked':''}/></label><button type="button" class="arcane-button secondary" id="clearLearningButton">✎ Borrar solo el historial de aprendizaje</button><button type="button" class="arcane-button secondary" id="replayTutorial">✧ Repetir tutorial</button><button type="button" class="arcane-button secondary" id="resetGameButton">↻ Reiniciar partida</button></div>`);
  }
  /* Navegación */
  $$('.nav-link').forEach(el=>el.addEventListener('click',()=>el.dataset.go==='aventura'&&!state.started?beginAdventure():navigate(el.dataset.go)));
@@ -422,21 +421,20 @@
  $('#spellInput').addEventListener('input',()=>$('#spellCount').textContent=`${[...$('#spellInput').value].length}/180`);
  $('#spellInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){event.preventDefault();cast();}});
  $('#openGrimoire').addEventListener('click',()=>navigate('grimorio'));
- $('#hintButton').addEventListener('click',()=>{const r=G.currentPuzzle();openModal(`✧ Pista: ${r.title}`,`<p>${safe(T.help(r,state.difficulty))}</p><p class="modal-note">Consultar pistas no gasta puntos de vida. Modo ${modeInfo().label}: ${safe(hints[state.difficulty])}</p>`);});
  $('#validationButton').addEventListener('click',()=>{educationResult=null;navigate('validacion');});
  $('#continueFromValidation').addEventListener('click',()=>navigate(educationResult?'practica':isReviewing()?'aventura':state.solved[state.currentRoom]?'progreso':'aventura'));
- $('#audioButton').addEventListener('click',()=>{const on=M.toggle();updateAudio();toast(on?`♫ Ambiente suave activado · ${D.rooms[state.currentRoom].music}`:'Música y sonidos desactivados');});
+ $('#audioButton').addEventListener('click',()=>{const on=M.toggle();updateAudio();toast(on?`♫ Banda sonora activada · ${D.rooms[state.currentRoom].music}`:'Música y sonidos desactivados');});
  $('#settingsButton').addEventListener('click',()=>{if(busy||doorOpening){toast('✧ Espera a que termine la secuencia mágica.');return;}showSettings();});
  $('#modalClose').addEventListener('click',closeModal);$('#modalOk').addEventListener('click',closeModal);
  $('#modalBackdrop').addEventListener('click',event=>{if(event.target===$('#modalBackdrop'))closeModal();});
  window.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#modalBackdrop').hidden)closeModal();});
  $('#modalBody').addEventListener('click',event=>{
   const t=event.target;
-  if(t.id==='resetGameButton'){reviewRoomIndex=null;archiveResult=null;doorOpening=false;G.resetGame();closeModal();updateDifficultyUI();renderProgress();renderRoom();setStatus('neutral','Partida reiniciada. ¡Elige de nuevo tus conjuros!');navigate('inicio');toast('Aventura reiniciada.');}
-  if(t.id==='confirmDifficulty'){reviewRoomIndex=null;archiveResult=null;doorOpening=false;G.setDifficulty(t.dataset.mode);closeModal();renderProgress();renderRoom();setStatus('neutral','Nueva dificultad seleccionada.');navigate('inicio');toast(`Nuevo modo: ${modeInfo().label}`);}
+  if(t.id==='resetGameButton'){window.SpellRewardsV8.resetCombo();reviewRoomIndex=null;archiveResult=null;doorOpening=false;G.resetGame();closeModal();updateDifficultyUI();renderProgress();renderRoom();setStatus('neutral','Partida reiniciada. ¡Elige de nuevo tus conjuros!');navigate('inicio');toast('Aventura reiniciada.');}
+  if(t.id==='confirmDifficulty'){window.SpellRewardsV8.resetCombo();reviewRoomIndex=null;archiveResult=null;doorOpening=false;G.setDifficulty(t.dataset.mode);closeModal();renderProgress();renderRoom();setStatus('neutral','Nueva dificultad seleccionada.');navigate('inicio');toast(`Nuevo modo: ${modeInfo().label}`);}
   if(t.id==='cancelDifficulty')closeModal();
   if(t.id==='showVictoryMap'){closeModal();navigate('progreso');}
-  if(t.id==='settingsAudioButton'){M.toggle();updateAudio();t.textContent=M.isEnabled()?'Desactivar':'Activar';toast(M.isEnabled()?'Música suave activada':'Audio desactivado');}
+  if(t.id==='settingsAudioButton'){M.toggle();updateAudio();t.textContent=M.isEnabled()?'Desactivar':'Activar';toast(M.isEnabled()?'Música activada':'Audio desactivado');}
   if(t.id==='replayTutorial'){closeModal();tutorialStep=0;visitedGrimoire=false;showTutorial();}
   if(t.id==='clearLearningButton'){openModal('¿Borrar tus estadísticas de escritura?',`<p>Se eliminarán únicamente los registros de prácticas educativas de la V4. Tus habitaciones, vidas, archivos AFD y partida V3 permanecerán intactos.</p><button type="button" class="arcane-button primary" id="confirmClearLearning">Confirmar borrado de prácticas</button>`);}
   if(t.id==='confirmClearLearning'){window.SpellLearningProgress.clear();closeModal();renderLearningStats();toast('Historial educativo borrado; la campaña se conserva.');}
@@ -444,11 +442,12 @@
  $('#modalBody').addEventListener('change',event=>{
   const el=event.target;
   if(el.id==='difficultyInSettings'){const choice=el.value;closeModal();askDifficulty(choice);}
+  if(el.id==='v9VideoQuality')SpellVideoQuality.set(el.value);
   if(el.id==='graphicsMode')window.SpellGraphics.set(el.value);
   if(el.id==='learningRecommendations')window.SpellLearningProgress.toggleRecommendations(el.checked);
   if(el.id==='volumeRange'){M.setVolume(Number(el.value)/100);$('#volumeValue').textContent=el.value+'%';}
  });
- $('#modalBody').addEventListener('input',event=>{if(event.target.id==='volumeRange'){M.setVolume(Number(event.target.value)/100);$('#volumeValue').textContent=event.target.value+'%';}});
+ $('#modalBody').addEventListener('input',event=>{const e=event.target;if(e.dataset.mix){const k=e.dataset.mix,v=Number(e.value)/100;SpellAudioMix.set(k,v);if(k==='effects')M.setEffectsVolume(v);if(k==='voice')M.setVoiceVolume(v);e.nextElementSibling.textContent=e.value+'%';}if(event.target.id==='volumeRange'){M.setVolume(Number(event.target.value)/100);$('#volumeValue').textContent=event.target.value+'%';}});
  $('#practiceFromRoom').addEventListener('click',()=>practiceNavigate(state.currentRoom));
  $('#practiceFromGrimoire').addEventListener('click',()=>practiceNavigate(state.currentRoom));
  $('#learningSuggestions').addEventListener('click',e=>{const button=e.target.closest('[data-recommended-exercise]');if(!button)return;const ex=window.SpellWritingRules.get(button.dataset.recommendedExercise);if(!ex)return;practiceRoom=ex.room;selectedPracticeId=ex.id;$('#practiceInput').value='';navigate('practica');});
@@ -463,8 +462,11 @@
  $('#aetherHelp').addEventListener('click',()=>{if(busy||isReviewing()||state.solved[state.currentRoom])return;showAether({show:true,message:T.help(G.currentPuzzle(),state.difficulty),guide:state.difficulty==='facil'});});
  $('#aetherBuild').addEventListener('click',()=>{if(busy||state.solved[state.currentRoom]||state.difficulty!=='facil')return;buildSpell();});
  $('#aetherApply').addEventListener('click',()=>{if(busy||state.solved[state.currentRoom]||!tutorAdvice?.suggestion)return;$('#spellInput').value=tutorAdvice.suggestion;$('#spellInput').dispatchEvent(new Event('input'));$('#spellInput').focus();});
- $('#inspectRune').addEventListener('click',()=>{if(busy||isReviewing()||state.solved[state.currentRoom])return;const p=G.currentPuzzle();T.inspect(p,state.currentRoom);$('#encounterClue').hidden=false;$('#encounterClue').textContent=T.help(p,state.difficulty);$('#encounterUI').classList.add('inspected');M.reward('riddle',D.rooms[state.currentRoom].id);});
+ $('#inspectRune').addEventListener('click',()=>{if(busy||isReviewing()||state.solved[state.currentRoom])return;const p=G.currentPuzzle();T.inspect(p,state.currentRoom);const secret=window.SpellRewardsV8.discover(p,state.currentRoom);$('#encounterClue').hidden=false;$('#encounterClue').textContent=(secret?'✦ Secreto descubierto. '+secret+' ':'')+'Aether: '+T.help(p,state.difficulty);$('#encounterUI').classList.add('inspected');M.reward('riddle',D.rooms[state.currentRoom].id);});
  window.SpellAFDView.bind();renderLearningStats();
- $('#v7PerfButton').addEventListener('click',()=>{const p=$('#v7FPS');p.hidden=!p.hidden;});window.SpellScenes.init();window.SpellCompanion.init();window.SpellParticles.init();window.SpellCinema.init();updateDifficultyUI();renderRoom();renderProgress();makeParticles();updateAudio();
+ $('#v7PerfButton').addEventListener('click',()=>{const p=$('#v7FPS');p.hidden=!p.hidden;});window.SpellScenes.init();window.SpellVideoBackgrounds.init();window.SpellCompanion.init();window.SpellParticles.init();window.SpellCinema.init();updateDifficultyUI();renderRoom();renderProgress();updateAudio();
+ function showV8Reward(r){if(!r||(!r.rune&&r.combo<3&&!r.awards.length))return;const stage=$('#roomScreen');let box=stage.querySelector('.v8-combo');if(!box){box=document.createElement('div');box.className='v8-combo';stage.appendChild(box);}const title=r.rune?'✦ '+r.rune:r.combo+'× COMBO';box.innerHTML=`<strong>${safe(title)}</strong><small>${r.bonus?'+'+r.bonus+' XP de combo':r.awards.length?safe(r.awards[0]):'Magia en armonía'}</small>`;box.hidden=false;clearTimeout(box._hide);if(window.gsap&&SpellGraphics.get()==='full'){gsap.killTweensOf(box);gsap.fromTo(box,{opacity:0,y:18,scale:.85},{opacity:1,y:0,scale:1,duration:.48,ease:'back.out(1.7)'});}box._hide=setTimeout(()=>{if(window.gsap&&SpellGraphics.get()==='full')gsap.to(box,{opacity:0,y:-13,duration:.35,onComplete:()=>box.hidden=true});else box.hidden=true;},2200);}
+ function activateAudioOnce(e){if(e.target?.closest?.('#audioButton,#settingsButton'))return;document.removeEventListener('pointerdown',activateAudioOnce,true);document.removeEventListener('keydown',activateAudioOnce,true);if(!SpellAudioMix.settings().muted){M.enable();updateAudio();}}
+ document.addEventListener('pointerdown',activateAudioOnce,true);document.addEventListener('keydown',activateAudioOnce,true);
  window.SpellUI={navigate,renderRoom,renderProgress,renderValidation,showTutorial,setReducedMotion,cast,renderPractice,renderLearningStats};
 })();
